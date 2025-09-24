@@ -1,3 +1,1 @@
 # CrossingWRPG
-
-Karen Ocampo
