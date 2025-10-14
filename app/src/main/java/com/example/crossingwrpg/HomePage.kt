@@ -59,7 +59,7 @@ fun HomePage(onNavigateToHome: () -> Unit) {
         )
 
         Button(
-            onClick = { /* Story */ },
+            onClick = {/*story*/ },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black.copy(alpha = 0.7f)
             ),
