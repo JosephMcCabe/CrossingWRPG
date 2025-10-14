@@ -35,10 +35,11 @@ fun AppNavigation() {
             onNavigateToWalk = { currentScreen = "home_page"}
         )
         "home_page" -> HomePage(
-            onNavigateToHome = { currentScreen = "map_screen"}
+            onNavigateToHome = { currentScreen = "map_screen"},
+            onNavigateToStory = { currentScreen = "story_page"}
         )
         "story_page" -> BattleScreen(
-            onNavigateToCombat = { currentScreen = "story_page"}
+            onNavigateToStory = { currentScreen = "story_page"}
         )
     }
 }

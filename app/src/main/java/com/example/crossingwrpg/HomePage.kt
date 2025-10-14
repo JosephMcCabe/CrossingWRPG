@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomePage(onNavigateToHome: () -> Unit) {
+fun HomePage(onNavigateToHome: () -> Unit, onNavigateToStory: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -59,7 +59,7 @@ fun HomePage(onNavigateToHome: () -> Unit) {
         )
 
         Button(
-            onClick = {/*story*/ },
+            onClick = onNavigateToStory,
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black.copy(alpha = 0.7f)
             ),
