@@ -28,18 +28,22 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun AppNavigation() {
+    // State variable that controls which screen is visible when opening app
     var currentScreen by remember {mutableStateOf("home_page")}
 
+    // Main composable function that switches between screens
     when (currentScreen) {
+        // If current state is "map_screen"
         "map_screen" -> WalkMapScreen(
-            onNavigateToWalk = { currentScreen = "home_page"}
+            // When "Home" button is pressed (onNavigateToHome is triggered)
+            // Updates state to "home_page"
+            onNavigateToHome = { currentScreen = "home_page"}
         )
+        // If current state is "home_page"
         "home_page" -> HomePage(
-            onNavigateToHome = { currentScreen = "map_screen"},
-            onNavigateToStory = { currentScreen = "story_page"}
-        )
-        "story_page" -> BattleScreen(
-            onNavigateToStory = { currentScreen = "story_page"}
+            // When "Walk" button is pressed (onNavigateToWalk is triggered)
+            // Updates state to "map_screen"
+            onNavigateToWalk = { currentScreen = "map_screen"},
         )
     }
 }
