@@ -6,6 +6,7 @@ import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.annotation.RequiresPermission
+import androidx.compose.runtime.Composable
 import com.google.android.gms.location.FusedLocationProviderClient
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -19,7 +20,6 @@ import com.google.android.gms.location.LocationServices
 
 //Prepares getting ready for location
 private lateinit var fusedLocationClient: FusedLocationProviderClient
-
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 

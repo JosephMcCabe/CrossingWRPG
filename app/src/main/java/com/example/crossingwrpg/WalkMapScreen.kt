@@ -19,11 +19,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.ui.platform.LocalContext
 
 
 // This screen shows a map or path and provides navigation and core game action buttons.
 @Composable
 fun WalkMapScreen(onNavigateToHome: () -> Unit) {
+    val currentContext = LocalContext.current
+
     // Box used to stack background image, title, and buttons
     Box(
         modifier = Modifier.fillMaxSize()
@@ -89,7 +97,10 @@ fun WalkMapScreen(onNavigateToHome: () -> Unit) {
         // Primary action button ("Start Walking")
         // When button is pressed navigates to TODO: add WalkScreenName here.
         Button(
-            onClick = { /* Walk */ },
+            onClick = {
+                val createIntent = Intent(currentContext, MapsActivity::class.java)
+                currentContext.startActivity(createIntent)
+            },
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black.copy(alpha = 0.8f)
