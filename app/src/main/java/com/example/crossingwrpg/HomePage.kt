@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 
 // A main menu screen displaying the character, game title, and navigation buttons for "Walk" and "Story."
 @Composable
-fun HomePage(onNavigateToWalk: () -> Unit) {
+fun HomePage(onNavigateToWalk: () -> Unit, onNavigateToStory: () -> Unit) {
     // Box used to stack main character image, title, and buttons
     Box(
         // Box takes up entire screen
@@ -73,9 +73,9 @@ fun HomePage(onNavigateToWalk: () -> Unit) {
         )
 
         // Story button (Bottom-Left)
-        // When button is pressed navigates to TODO: add StoryScreenName here.
+        // When button is pressed navigates to StoryPage
         Button(
-            onClick = { /* Story */ },
+            onClick = onNavigateToStory,
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black.copy(alpha = 0.7f)
             ),
