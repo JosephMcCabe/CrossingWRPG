@@ -131,6 +131,11 @@ class BattleSimulation {
             else -> {}
         }
     }
+
+    fun reset() {
+        player = Character("Joey", 100, 25, 11, 15)
+        enemy = Character("Evil Goblin thing",150, 15, 5, 0)
+    }
 }
 
 @Composable
@@ -153,6 +158,12 @@ fun BattleScreen(onNavigateToHome: () -> Unit) {
             .padding(32.dp)
             ) {
         // Home Button
+        Button(
+            onClick = { onNavigateToHome() },
+            modifier = Modifier.align(Alignment.TopStart)
+        ) {
+            Text("back")
+        }
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -234,7 +245,11 @@ fun BattleScreen(onNavigateToHome: () -> Unit) {
                 }
 
                 is BattleState.End -> {
-                    Button(onClick = onNavigateToHome) { Text("Return Home") }
+                    Button(onClick = {
+                        battleSimulation.reset()
+                        state = battleSimulation.state
+                        onNavigateToHome()
+                    }) { Text("Return Home") }
                 }
             }
         }
