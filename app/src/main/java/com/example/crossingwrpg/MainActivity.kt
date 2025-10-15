@@ -44,6 +44,14 @@ fun AppNavigation() {
             // When "Walk" button is pressed (onNavigateToWalk is triggered)
             // Updates state to "map_screen"
             onNavigateToWalk = { currentScreen = "map_screen"},
+            onNavigateToStory = { currentScreen = "story_page"}
+        )
+
+        // If current state is "CombatScreen"
+        "story_page" -> BattleScreen(
+            // When "Home" button is pressed (onNavigateToHome is triggered)
+            // Updates state to "home_page"
+            onNavigateToHome = { currentScreen = "home_page"}
         )
     }
 }
