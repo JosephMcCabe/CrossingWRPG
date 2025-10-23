@@ -19,18 +19,31 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.ui.platform.LocalContext
 
+
+// This screen shows a map or path and provides navigation and core game action buttons.
 @Composable
-fun WalkMapScreen(onNavigateToWalk: () -> Unit) {
+fun WalkMapScreen(onNavigateToHome: () -> Unit) {
+    val currentContext = LocalContext.current
+
+    // Box used to stack background image, title, and buttons
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        // Displays background image from drawable and fills the screen
         Image(
             modifier = Modifier.fillMaxSize(),
             painter = painterResource(R.drawable.pathimage),
             contentDescription = null,
             contentScale = ContentScale.FillBounds
         )
+        // Displays the Game Title Text
         Text(
             text = "Crossing",
             fontFamily = pixelFontFamily,
@@ -41,11 +54,14 @@ fun WalkMapScreen(onNavigateToWalk: () -> Unit) {
                 .align(Alignment.TopCenter)
                 .padding(top = 30.dp)
                 .background(
+                    // Border is transparent by 0.7f
                     Color.Black.copy(alpha = 0.7f),
+                    // Rounds the corner of the border
                     shape = RoundedCornerShape(16.dp)
                 )
                 .padding(16.dp)
         )
+        // Displays Subtitle Text
         Text(
             text = "A Walking RPG",
             fontFamily = pixelFontFamily,
@@ -58,8 +74,9 @@ fun WalkMapScreen(onNavigateToWalk: () -> Unit) {
                 .padding(16.dp)
         )
 
+        // When button is pressed navigates to HomePage
         Button(
-            onClick = onNavigateToWalk,
+            onClick = onNavigateToHome,
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black.copy(alpha = 0.6f)
             ),
@@ -68,6 +85,7 @@ fun WalkMapScreen(onNavigateToWalk: () -> Unit) {
                 .padding(start = 20.dp, bottom = 70.dp)
                 .size(93.dp)
         ) {
+            // "Home" Text on Button
             Text(
                 text = "Home",
                 fontSize = 22.sp,
@@ -76,8 +94,13 @@ fun WalkMapScreen(onNavigateToWalk: () -> Unit) {
             )
         }
 
+        // Primary action button ("Start Walking")
+        // When button is pressed navigates to TODO: add WalkScreenName here.
         Button(
-            onClick = { /* Walk */ },
+            onClick = {
+                val createIntent = Intent(currentContext, MapsActivity::class.java)
+                currentContext.startActivity(createIntent)
+            },
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black.copy(alpha = 0.8f)
@@ -87,6 +110,7 @@ fun WalkMapScreen(onNavigateToWalk: () -> Unit) {
                 .padding(bottom = 60.dp)
                 .size(120.dp)
         ) {
+            // "Start Walking" text on button
             Text(
                 text = "Start Walking",
                 fontSize = 27.sp,
