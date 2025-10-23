@@ -6,10 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,9 +17,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// A main menu screen displaying the character, game title, and navigation buttons for "Walk" and "Story."
+// A main menu screen displaying the character, game title, and navigation bar.
 @Composable
-fun HomePage(onNavigateToWalk: () -> Unit, onNavigateToStory: () -> Unit) {
+fun HomePage(onNavigateToStory: () -> Unit) {
     // Box used to stack main character image, title, and buttons
     Box(
         // Box takes up entire screen
@@ -71,48 +67,5 @@ fun HomePage(onNavigateToWalk: () -> Unit, onNavigateToStory: () -> Unit) {
                 .padding(top = 76.dp)
                 .padding(16.dp)
         )
-
-        // Story button (Bottom-Left)
-        // When button is pressed navigates to StoryPage
-        Button(
-            onClick = onNavigateToStory,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black.copy(alpha = 0.7f)
-            ),
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = 20.dp, bottom = 70.dp)
-                .size(93.dp)
-        ) {
-            // "Story" text on button
-            Text(
-                text = "Story",
-                fontSize = 22.sp,
-                fontFamily = pixelFontFamily,
-                textAlign = TextAlign.Center
-            )
-        }
-
-        // Walk Button (Bottom-Center)
-        // When button is pressed navigates to WalkMapScreen
-        Button(
-            onClick = onNavigateToWalk,
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black.copy(alpha = 0.9f)
-            ),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 60.dp)
-                .size(120.dp)
-        ) {
-            // "Walk" text on button
-            Text(
-                text = "Walk",
-                fontSize = 30.sp,
-                fontFamily = pixelFontFamily,
-                textAlign = TextAlign.Center
-            )
-        }
     }
 }
