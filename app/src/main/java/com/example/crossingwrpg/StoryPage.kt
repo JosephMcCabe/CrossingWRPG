@@ -32,6 +32,7 @@ sealed class BattleState {
 
 // represents stats of a character
 data class Character(
+    // rename stats
     val name : String,
     var vit: Int,
     val str: Int,
