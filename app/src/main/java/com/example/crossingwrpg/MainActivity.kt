@@ -1,10 +1,12 @@
 package com.example.crossingwrpg
 
 import android.content.Intent
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -28,9 +30,22 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
+    //define permission launcher
+    private val requestNotifPerm = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        NotifPrefs.markAsked(this)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        if (
+            NotifPrefs.needsRuntimePermission() &&
+            !NotifPrefs.asked(this) &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+            != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestNotifPerm.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
         setContent {
             Surface(color = MaterialTheme.colorScheme.background) {
                 AppNavigation()
