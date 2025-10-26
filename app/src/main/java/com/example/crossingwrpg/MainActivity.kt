@@ -1,6 +1,5 @@
 package com.example.crossingwrpg
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -44,7 +42,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    val context = LocalContext.current
     // Define initial screen when opening app
     val startDestination = Destination.HOME
 
@@ -60,26 +57,19 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
                 // Builds a navigation item for each defined destination
                 Destination.entries.forEach { destination ->
-                    val isExternalWalk = destination == Destination.WALK_MAP
                     val isSelected = currentRoute == destination.route
 
                     NavigationBarItem(
                         selected = isSelected,
 
                         onClick = {
-                            if (isExternalWalk) {
-                                // Launches external MapsActivity
-                                val createIntent = Intent(context, MapsActivity::class.java)
-                                context.startActivity(createIntent)
-                            } else {
-                                // Standard internal navigation for HOME and BATTLE
-                                navController.navigate(route = destination.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
+                            // Standard internal navigation
+                            navController.navigate(route = destination.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
                                 }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         },
                         icon = {
@@ -116,6 +106,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 BattleScreen(
                     onNavigateToHome = { navController.navigate(Destination.HOME.route) }
                 )
+            }
+            // WALK Destination
+            composable(route = Destination.WALK_MAP.route) {
+                MapsWithPedometerScreen()
             }
         }
     }
