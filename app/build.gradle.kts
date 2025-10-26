@@ -52,6 +52,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -60,13 +63,10 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    implementation("com.google.maps.android:maps-compose:6.12.1")
+    implementation("com.google.maps.android:maps-compose:6.12.0")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.play.services.maps)
     implementation(libs.androidx.constraintlayout)
-
-    implementation("androidx.navigation:navigation-compose:2.9.5")
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
-
+    implementation("androidx.compose.material:material-icons-extended")
 }
