@@ -11,6 +11,9 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.crossingwrpg.R.drawable.pixelpotion
+
+
 
 class Notifications(private val context: Context) {
     private val levelUpChannelId = "level_up_channel"
@@ -35,7 +38,7 @@ class Notifications(private val context: Context) {
         )
 
         val levelUpNotification = NotificationCompat.Builder(context, levelUpChannelId)
-            .setSmallIcon(R.drawable.pixelpotion)
+            .setSmallIcon(pixelpotion)
             .setContentTitle("You leveled up!")
             .setContentText(messageText)
             .setAutoCancel(true)
