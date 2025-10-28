@@ -58,7 +58,7 @@ fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
     LaunchedEffect(isPedometerActive) {
         if (!isPedometerActive) return@LaunchedEffect
         while (isPedometerActive) {
-            kotlinx.coroutines.delay(30_000)
+            kotlinx.coroutines.delay(5_000)
             notifications.postLevelUp("Walking leveled you up! Steps: $stepCount")
         }
     }
