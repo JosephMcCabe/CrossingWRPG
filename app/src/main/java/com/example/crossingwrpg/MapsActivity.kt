@@ -1,18 +1,17 @@
 package com.example.crossingwrpg
 
 
-import android.Manifest
 import androidx.activity.ComponentActivity
 import android.os.Bundle
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,26 +50,17 @@ class MapsActivity : ComponentActivity() {
 fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
     val context = LocalContext.current
     val pedometer = remember { pedometer ?: Pedometer(context) }
-
     val stepCount by pedometer.stepCount.collectAsState()
 
-    val requestPermissions = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { perms ->
-        val recognitionGranted = perms[Manifest.permission.ACTIVITY_RECOGNITION] ?: false
-        if (recognitionGranted) {
-            pedometer.start()
-        }
-    }
+    val notifications = remember { Notifications(context).also {it.initChannel()} }
+    var isPedometerActive by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        requestPermissions.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            )
-        )
+    LaunchedEffect(isPedometerActive) {
+        if (!isPedometerActive) return@LaunchedEffect
+        while (isPedometerActive) {
+            kotlinx.coroutines.delay(5_000)
+            notifications.postLevelUp("Walking leveled you up! Steps: $stepCount")
+        }
     }
 
     val channelIslands = LatLng(34.161767, -119.043377)
@@ -101,13 +91,19 @@ fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
                 Text(text = "Steps: $stepCount", style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = { pedometer.start() }) {
+                    Button(onClick = {
+                        pedometer.start()
+                        isPedometerActive = true
+                    }) {
                         Text(
                             text = "Start",
                             fontFamily = pixelFontFamily
                         )
                     }
-                    Button(onClick = { pedometer.stop() }) {
+                    Button(onClick = {
+                        pedometer.stop()
+                        isPedometerActive = false
+                    }) {
                         Text(
                             text = "Stop",
                             fontFamily = pixelFontFamily

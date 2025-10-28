@@ -27,10 +27,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
+
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             Surface(color = MaterialTheme.colorScheme.background) {
                 AppNavigation()
@@ -38,6 +41,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 // Sets up the app's navigation and navigation bar structure
 @Preview

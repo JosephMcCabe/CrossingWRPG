@@ -176,8 +176,8 @@ fun CharacterHealthBar(character: Character, modifier: Modifier = Modifier, isPl
         LinearProgressIndicator(
             progress = { animatedProgress },
             modifier = Modifier
-                        .fillMaxWidth()
-                        .height(10.dp),
+                .fillMaxWidth()
+                .height(10.dp),
             color = healthBarColor,
             trackColor = trackColor,
             strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
