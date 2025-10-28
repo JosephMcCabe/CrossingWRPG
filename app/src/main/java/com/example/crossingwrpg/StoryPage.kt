@@ -13,13 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
 
 // state machine for battle
 sealed class BattleState {
@@ -148,27 +146,10 @@ fun BattleScreen(onNavigateToHome: () -> Unit) {
 
     var state by remember { mutableStateOf<BattleState>(BattleState.Start) }
 
-    //create context to post notifications from Compose
-    val context = LocalContext.current
-
     fun nextTurn() {
         battleSimulation.advanceBattle()
         state = battleSimulation.state
     }
-
-    LaunchedEffect(state) {
-        val end = state as? BattleState.End ?: return@LaunchedEffect
-        val playerWon =
-            end.winner.contains(player.name) &&
-                    end.winner.contains("defeated") &&
-                    !end.winner.contains("was defeated")
-        if (playerWon) {
-            //post victory notification
-            Notifier.showVictory(context, end.winner)
-        }
-
-    }
-
     //Box
     Box(
         modifier = Modifier

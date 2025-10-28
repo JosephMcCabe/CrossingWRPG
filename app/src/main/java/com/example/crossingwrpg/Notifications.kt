@@ -1,57 +1,65 @@
 package com.example.crossingwrpg
 
-import android.app.NotificationManager
+import android.Manifest
 import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
-import android.os.Build
-import android.util.Log
-import android.content.Intent
 import android.content.Context
-import android.content.Intent.*
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
-object Notifier{
-    private const val CHANNEL_ID = "battle_events_v2"//change channel_id when changing importance
-    private const val NOTIF_ID_VICTORY = 2001
+class Notifications(private val context: Context) {
 
-    private fun ensureChannel(context: Context) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = context.getString(R.string.channel_name)
-            val desc = context.getString(R.string.channel_description)
-            val channel = NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH).apply { description = desc }
+    private val levelUpChannelId = "level_up_channel"
 
-            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            nm.createNotificationChannel(channel)
+    fun initChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val levelUpChannel = NotificationChannel(
+                levelUpChannelId,
+                "Level Ups",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            notificationManager.createNotificationChannel(levelUpChannel)
         }
     }
-
-
-fun showVictory(context: Context, message: String) {
-    ensureChannel(context)
-    //tap notif to return to Main
-    val intent = Intent(context, MainActivity::class.java).apply {
-        //launch the app fresh from the notification
-        flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK
-    }
-    val pending = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-    val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-        .setSmallIcon(R.drawable.purplepotion)
-        .setContentTitle("You gained a Purple Potion!")
-        .setContentText(message)
-        .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        .setContentIntent(pending)
-        .setAutoCancel(true)
-
-    try{
-    NotificationManagerCompat.from(context).notify(NOTIF_ID_VICTORY, builder.build())
-    } catch (e: SecurityException) {
-    Log.w("Notifier", "Notification skipped (SecurityException).", e)
+    fun postLevelUp(messageText: String) {
+        val mainActivityIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-    }
 
+        val mainActivityPendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            mainActivityIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val levelUpNotification = NotificationCompat.Builder(context, levelUpChannelId)
+            .setSmallIcon(R.drawable.purplepotion)
+            .setContentTitle("You leveled up!")
+            .setContentText(messageText)
+            .setAutoCancel(true)
+            .setContentIntent(mainActivityPendingIntent)
+            .build()
+
+        // On Android 13+ (API 33), posting notifications requires POST_NOTIFICATIONS permission
+        val permissionNotGranted =
+            Build.VERSION.SDK_INT >= 33 &&
+                    ActivityCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+
+        if (permissionNotGranted) return
+
+        val notificationManager = NotificationManagerCompat.from(context)
+        notificationManager.notify(1001, levelUpNotification)
+    }
 }
-
-

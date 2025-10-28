@@ -3,4 +3,6 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="channel_name">Game Events</string>
     <string name="channel_description">Battle results and rewards</string>
+    <string name="channel_name_battle_victories">Battle Victories</string>
+    <string name="channel_description_battle_victories">Notifications about wins and battle rewards</string>
 </resources>

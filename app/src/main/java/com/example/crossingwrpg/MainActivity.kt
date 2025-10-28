@@ -1,9 +1,11 @@
 package com.example.crossingwrpg
 
 import android.os.Bundle
+import android.Manifest
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -25,10 +27,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
+
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             Surface(color = MaterialTheme.colorScheme.background) {
                 AppNavigation()
@@ -36,6 +41,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 // Sets up the app's navigation and navigation bar structure
 @Preview
