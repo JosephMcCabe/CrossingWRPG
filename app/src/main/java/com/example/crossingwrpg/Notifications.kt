@@ -21,7 +21,7 @@ class Notifications(private val context: Context) {
     fun initChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val levelUpChannel = NotificationChannel(
-                levelUpChannelId, "Level Ups", NotificationManager.IMPORTANCE_DEFAULT
+                levelUpChannelId, "Level Ups", NotificationManager.IMPORTANCE_HIGH
             )
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
