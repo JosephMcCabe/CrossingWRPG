@@ -150,6 +150,7 @@ fun BattleScreen(onNavigateToHome: () -> Unit) {
         battleSimulation.advanceBattle()
         state = battleSimulation.state
     }
+
     //Box
     Box(
         modifier = Modifier

@@ -19,7 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -119,4 +121,18 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
         }
     }
+}
+@Composable
+fun PixelText(
+    text: String,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = 25.sp
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        fontSize = fontSize,
+        textAlign = TextAlign.Center,
+        fontFamily = pixelFontFamily
+    )
 }

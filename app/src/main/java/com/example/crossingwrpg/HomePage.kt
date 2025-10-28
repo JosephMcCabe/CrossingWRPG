@@ -40,16 +40,13 @@ fun HomePage(onNavigateToStory: () -> Unit) {
     }
     // Box used to stack main character image, title, and buttons
     Box(
-        // Box takes up entire screen
         modifier = Modifier.fillMaxSize()
     ) {
-        // Column to center and contain large images
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Main character image displayed in the center of screen
             Image(
                 modifier = Modifier
                     .fillMaxSize()
@@ -61,7 +58,6 @@ fun HomePage(onNavigateToStory: () -> Unit) {
             )
         }
 
-        // Game Title Text
         Text(
             text = "Crossing",
             fontFamily = pixelFontFamily,
@@ -73,7 +69,6 @@ fun HomePage(onNavigateToStory: () -> Unit) {
                 .padding(top = 30.dp)
                 .padding(16.dp)
         )
-        // Game Subtitle Text
         Text(
             text = "A Walking RPG",
             fontFamily = pixelFontFamily,
