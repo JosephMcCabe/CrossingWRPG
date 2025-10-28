@@ -26,7 +26,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,13 +48,21 @@ class MapsActivity : ComponentActivity() {
     }
 }
 
+enum class WalkingState { Idle, Walking, Paused}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
+fun MapsWithPedometerScreen(
+    pedometer: Pedometer? = null,
+    stopwatch: Stopwatch? = null,
+) {
     val context = LocalContext.current
     val pedometer = remember { pedometer ?: Pedometer(context) }
+    val stopwatch = remember { stopwatch ?: Stopwatch() }
 
     val stepCount by pedometer.stepCount.collectAsState()
+    val elapsedTime by stopwatch.elapsedTime.collectAsState()
+
+    var walkState by remember { mutableStateOf(WalkingState.Idle) }
 
     val requestPermissions = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -99,19 +109,68 @@ fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Steps: $stepCount", style = MaterialTheme.typography.titleLarge)
+                Text(text = "Time: ${elapsedTime}s", style = MaterialTheme.typography.titleLarge)
+
                 Spacer(Modifier.height(8.dp))
+
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = { pedometer.start() }) {
-                        Text(
-                            text = "Start",
-                            fontFamily = pixelFontFamily
-                        )
-                    }
-                    Button(onClick = { pedometer.stop() }) {
-                        Text(
-                            text = "Stop",
-                            fontFamily = pixelFontFamily
-                        )
+
+                    // initial button state showing a start button
+                    when(walkState){
+                        WalkingState.Idle -> {
+                            Button(onClick = {
+                                pedometer.start()
+                                stopwatch.start()
+                                walkState = WalkingState.Walking
+                            }) {
+                                Text(
+                                    text = "Start",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                        }
+                        WalkingState.Walking -> {
+                            Button(onClick = {
+                                pedometer.stop()
+                                stopwatch.stop()
+                                walkState = WalkingState.Paused
+                            }) {
+                                Text(
+                                    text = "Pause",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                            Button(onClick = {
+                                pedometer.stop()
+                                stopwatch.stop()
+                            }) {
+                                Text(
+                                    text = "Stop",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                        }
+                        WalkingState.Paused -> {
+                            Button(onClick = {
+                                pedometer.start()
+                                stopwatch.start()
+                                walkState = WalkingState.Walking
+                            }) {
+                                Text(
+                                    text = "Continue",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                            Button(onClick = {
+                                pedometer.stop()
+                                stopwatch.stop()
+                            }) {
+                                Text(
+                                    text = "Stop",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                        }
                     }
                 }
             }
