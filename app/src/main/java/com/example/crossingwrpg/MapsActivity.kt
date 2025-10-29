@@ -1,7 +1,6 @@
 package com.example.crossingwrpg
 
 
-
 import androidx.activity.ComponentActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -31,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -40,7 +41,8 @@ class MapsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                MapsWithPedometerScreen()
+                val navController = rememberNavController()
+                MapsWithPedometerScreen(navController = navController)
             }
         }
     }
@@ -52,6 +54,7 @@ enum class WalkingState { Idle, Walking, Paused}
 fun MapsWithPedometerScreen(
     pedometer: Pedometer? = null,
     stopwatch: Stopwatch? = null,
+    navController: NavHostController
 ) {
     val context = LocalContext.current
     val pedometer = remember { pedometer ?: Pedometer(context) }
@@ -62,13 +65,25 @@ fun MapsWithPedometerScreen(
 
     var walkState by remember { mutableStateOf(WalkingState.Idle) }
 
+
     val notifications = remember { Notifications(context).also {it.initChannel()} }
     var isPedometerActive by remember { mutableStateOf(false) }
+    // Reset everything each time the Walk screen is shown
+    LaunchedEffect(Unit) {
+        stopwatch.stop()
+        stopwatch.reset()
+
+        pedometer.stop()
+        pedometer.reset()   // <-- ensure your Pedometer class has this
+
+        walkState = WalkingState.Idle
+        isPedometerActive = false
+    }
 
     LaunchedEffect(isPedometerActive) {
         if (!isPedometerActive) return@LaunchedEffect
         while (isPedometerActive) {
-            kotlinx.coroutines.delay(1_000)
+            kotlinx.coroutines.delay(5000)
             notifications.postLevelUp("Walking leveled you up! Steps: $stepCount")
         }
     }
@@ -136,6 +151,9 @@ fun MapsWithPedometerScreen(
                                 pedometer.stop()
                                 stopwatch.stop()
                                 isPedometerActive = false
+
+                                navController.navigate("health_stats?steps=$stepCount&time=$elapsedTime")
+                                walkState = WalkingState.Idle
                             }) {
                                 Text(
                                     text = "Stop",
@@ -159,7 +177,10 @@ fun MapsWithPedometerScreen(
                                 pedometer.stop()
                                 stopwatch.stop()
                                 isPedometerActive = false
-                            }) {
+
+                                navController.navigate("health_stats?steps=$stepCount&time=$elapsedTime")
+                                walkState = WalkingState.Idle
+                            }){
                                 Text(
                                     text = "Stop",
                                     fontFamily = pixelFontFamily
@@ -172,3 +193,4 @@ fun MapsWithPedometerScreen(
         }
     }
 }
+

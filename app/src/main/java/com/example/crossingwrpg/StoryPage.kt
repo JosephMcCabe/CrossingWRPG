@@ -141,7 +141,7 @@ class BattleSimulation(
     }
 
     fun reset() {
-        playerState.value = Character("Joey", 100, 100,25, 11, 15)
+        playerState.value = Character("Fatima", 100, 100,25, 11, 15)
         enemyState.value = Character("Evil Goblin thing",150, 150, 15, 5, 0)
         state.value = BattleState.Start
     }
@@ -188,7 +188,7 @@ fun CharacterHealthBar(character: Character, modifier: Modifier = Modifier, isPl
 @Composable
 fun BattleScreen(onNavigateToHome: () -> Unit) {
 
-    val playerState = remember { mutableStateOf(Character("Joey", 100, 100, 25, 11, 15)) }
+    val playerState = remember { mutableStateOf(Character("Fatima", 100, 100, 25, 11, 15)) }
     val enemyState = remember { mutableStateOf(Character("Evil Goblin thing", 150, 150, 15, 5, 0)) }
 
     // remember battle simulation
