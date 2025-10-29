@@ -17,7 +17,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -25,10 +27,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
+
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             Surface(color = MaterialTheme.colorScheme.background) {
                 AppNavigation()
@@ -36,6 +41,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 // Sets up the app's navigation and navigation bar structure
 @Preview
@@ -113,4 +119,18 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
         }
     }
+}
+@Composable
+fun PixelText(
+    text: String,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = 25.sp
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        fontSize = fontSize,
+        textAlign = TextAlign.Center,
+        fontFamily = pixelFontFamily
+    )
 }
