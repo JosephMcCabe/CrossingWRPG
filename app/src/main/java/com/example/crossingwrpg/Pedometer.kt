@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 
 
 class Pedometer(context: Context): SensorEventListener {
@@ -29,7 +28,8 @@ class Pedometer(context: Context): SensorEventListener {
     override fun onSensorChanged(sensorEvent: SensorEvent?) {
         sensorEvent?.let { event ->
             if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-                counter.update { it.plus(1) }
+                val totalSteps = event.values[0].toLong()
+                counter.value = totalSteps
             }
         }
     }
