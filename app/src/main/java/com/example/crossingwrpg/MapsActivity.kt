@@ -3,13 +3,10 @@ package com.example.crossingwrpg
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.activity.ComponentActivity
 import android.os.Bundle
-import android.os.Looper
-import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -31,7 +28,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -49,14 +44,16 @@ import com.google.maps.android.compose.*
 
 private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-lateinit var map: GoogleMap
 
 //Value for current position, sets default location if location not found
 var currentLatLng = LatLng(34.161767, -119.043377)
 var askToEnablePermissions: Boolean = true
 
+var locationFound: Boolean = false
+
 var varLatitude = 0.0
 var varLongitude = 0.0
+
 
 
 class MapsActivity : ComponentActivity() {
@@ -94,19 +91,10 @@ fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
         }
     }
 
-    LaunchedEffect(Unit) {
-        requestPermissions.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            )
-        )
-    }
-
 
         fun checkLocationPermissions() {
-        if (ActivityCompat.checkSelfPermission(
+
+            if (askToEnablePermissions && ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
@@ -114,11 +102,13 @@ fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED)
         {
+
             Toast.makeText(
                 context,
                 "Please accept all location permissions to track your location.",
                 Toast.LENGTH_LONG
             ).show()
+            askToEnablePermissions = false
             return
         }
 
@@ -128,12 +118,18 @@ fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(currentLatLng, 16f)
+
+    }
+
     fusedLocationClient.lastLocation
         .addOnSuccessListener { location : Location? ->
             if (location != null) {
                 varLatitude = location.latitude
                 varLongitude = location.longitude
                 currentLatLng = LatLng(varLatitude, varLongitude)
+                locationFound = true
             }
             else if (askToEnablePermissions) {
                 Toast.makeText( context,
@@ -145,12 +141,6 @@ fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
         }
 
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(currentLatLng, 13f)
-
-
-
-    }
 
 
 
@@ -162,7 +152,7 @@ fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
         )
         {
             Marker(
-                state = MarkerState(position = LatLng(varLatitude, varLongitude)), // Example: Sydney
+                state = MarkerState(position = currentLatLng),
                 title = "Current Location",
             )
 
