@@ -32,6 +32,7 @@ sealed class BattleState {
 
 // represents stats of a character
 data class Character(
+    // rename stats
     val name : String,
     var vit: Int,
     val str: Int,
@@ -143,7 +144,6 @@ fun BattleScreen(onNavigateToHome: () -> Unit) {
     // remember battle simulation
     val battleSimulation = remember { BattleSimulation() }
 
-
     var state by remember { mutableStateOf<BattleState>(BattleState.Start) }
 
     fun nextTurn() {
@@ -156,14 +156,7 @@ fun BattleScreen(onNavigateToHome: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .padding(32.dp)
-            ) {
-        // Home Button
-        Button(
-            onClick = { onNavigateToHome() },
-            modifier = Modifier.align(Alignment.TopStart)
-        ) {
-            Text("back")
-        }
+    ) {
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
