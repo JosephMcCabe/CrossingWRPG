@@ -64,23 +64,15 @@ fun MapsWithPedometerScreen(
 
     var walkState by remember { mutableStateOf(WalkingState.Idle) }
 
-    val requestPermissions = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { perms ->
-        val recognitionGranted = perms[Manifest.permission.ACTIVITY_RECOGNITION] ?: false
-        if (recognitionGranted) {
-            pedometer.start()
-        }
-    }
+    val notifications = remember { Notifications(context).also {it.initChannel()} }
+    var isPedometerActive by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        requestPermissions.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            )
-        )
+    LaunchedEffect(isPedometerActive) {
+        if (!isPedometerActive) return@LaunchedEffect
+        while (isPedometerActive) {
+            kotlinx.coroutines.delay(5_000)
+            notifications.postLevelUp("Walking leveled you up! Steps: $stepCount")
+        }
     }
 
     val channelIslands = LatLng(34.161767, -119.043377)
@@ -122,6 +114,7 @@ fun MapsWithPedometerScreen(
                                 pedometer.start()
                                 stopwatch.start()
                                 walkState = WalkingState.Walking
+                                isPedometerActive = true
                             }) {
                                 Text(
                                     text = "Start",
@@ -134,6 +127,7 @@ fun MapsWithPedometerScreen(
                                 pedometer.stop()
                                 stopwatch.stop()
                                 walkState = WalkingState.Paused
+                                isPedometerActive = false
                             }) {
                                 Text(
                                     text = "Pause",
@@ -143,6 +137,7 @@ fun MapsWithPedometerScreen(
                             Button(onClick = {
                                 pedometer.stop()
                                 stopwatch.stop()
+                                isPedometerActive = false
                             }) {
                                 Text(
                                     text = "Stop",
@@ -155,6 +150,7 @@ fun MapsWithPedometerScreen(
                                 pedometer.start()
                                 stopwatch.start()
                                 walkState = WalkingState.Walking
+                                isPedometerActive = true
                             }) {
                                 Text(
                                     text = "Continue",
@@ -164,6 +160,7 @@ fun MapsWithPedometerScreen(
                             Button(onClick = {
                                 pedometer.stop()
                                 stopwatch.stop()
+                                isPedometerActive = false
                             }) {
                                 Text(
                                     text = "Stop",
