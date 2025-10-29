@@ -21,22 +21,37 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    private val battleSimulation = BattleSimulation()
+    private val pedometer by lazy { Pedometer(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                pedometer.stepCount.collectLatest {
+                    newSteps -> battleSimulation.updateSteps(newTotalSteps = newSteps)
+                }
+            }
+        }
+
         setContent {
             Surface(color = MaterialTheme.colorScheme.background) {
-                AppNavigation()
+                AppNavigation(battleSimulation = battleSimulation)
             }
         }
     }
@@ -46,22 +61,17 @@ class MainActivity : ComponentActivity() {
 // Sets up the app's navigation and navigation bar structure
 @Preview
 @Composable
-fun AppNavigation(modifier: Modifier = Modifier) {
+fun AppNavigation(modifier: Modifier = Modifier, battleSimulation: BattleSimulation) {
     val navController = rememberNavController()
-    // Define initial screen when opening app
     val startDestination = Destination.HOME
 
-    // Get currently visible screen
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Scaffold provides overall screen structure
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            // Build bottom navigation bar
             NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-                // Builds a navigation item for each defined destination
                 Destination.entries.forEach { destination ->
                     val isSelected = currentRoute == destination.route
 
@@ -69,7 +79,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         selected = isSelected,
 
                         onClick = {
-                            // Standard internal navigation
                             navController.navigate(route = destination.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
@@ -95,25 +104,25 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 }
             }
         }
-    ) { contentPadding ->
+    ) {
+        contentPadding ->
         NavHost(
             navController = navController,
             startDestination = startDestination.route,
             modifier = Modifier.padding(contentPadding)
         ) {
-            // HOME Destination
             composable(route = Destination.HOME.route) {
                 HomePage(
+                    battleSimulation = battleSimulation,
                     onNavigateToStory = { navController.navigate(Destination.BATTLE.route) }
                 )
             }
-            // BATTLE Destination
             composable(route = Destination.BATTLE.route) {
                 BattleScreen(
+                    battleSimulation = battleSimulation,
                     onNavigateToHome = { navController.navigate(Destination.HOME.route) }
                 )
             }
-            // WALK Destination
             composable(route = Destination.WALK_MAP.route) {
                 MapsWithPedometerScreen()
             }
