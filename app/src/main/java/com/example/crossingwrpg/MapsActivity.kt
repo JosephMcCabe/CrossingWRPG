@@ -1,12 +1,10 @@
 package com.example.crossingwrpg
 
 
-import android.Manifest
+
 import androidx.activity.ComponentActivity
 import android.os.Bundle
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -70,7 +68,7 @@ fun MapsWithPedometerScreen(
     LaunchedEffect(isPedometerActive) {
         if (!isPedometerActive) return@LaunchedEffect
         while (isPedometerActive) {
-            kotlinx.coroutines.delay(5_000)
+            kotlinx.coroutines.delay(1_000)
             notifications.postLevelUp("Walking leveled you up! Steps: $stepCount")
         }
     }
