@@ -4,11 +4,15 @@ import android.Manifest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -80,5 +84,32 @@ fun HomePage(onNavigateToStory: () -> Unit) {
                 .padding(top = 76.dp)
                 .padding(16.dp)
         )
+        Box(
+            contentAlignment = Alignment.CenterEnd,
+            modifier = Modifier.fillMaxSize()
+                .padding(top = 128.dp)
+                .padding(16.dp)
+
+        )
+        {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Default.EmojiEvents,
+                    contentDescription = "Trophy Image",
+                )
+                Text(
+                    text = "Achievements",
+                    fontFamily = pixelFontFamily,
+                    textAlign = TextAlign.Center,
+                    fontSize = 25.sp,
+                    color = Color.DarkGray,
+                    modifier = Modifier
+                )
+            }
+        }
     }
 }
