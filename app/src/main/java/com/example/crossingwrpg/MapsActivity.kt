@@ -1,16 +1,9 @@
 package com.example.crossingwrpg
 
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.location.Location
 import androidx.activity.ComponentActivity
 import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,135 +21,84 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
-
-private lateinit var fusedLocationClient: FusedLocationProviderClient
-
-
-//Value for current position, sets default location if location not found
-var currentLatLng = LatLng(34.161767, -119.043377)
-var askToEnablePermissions: Boolean = true
-
-var locationFound: Boolean = false
-
-var varLatitude = 0.0
-var varLongitude = 0.0
-
-
-
 class MapsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-
         setContent {
             MaterialTheme {
-                MapsWithPedometerScreen()
+                val navController = rememberNavController()
+                MapsWithPedometerScreen(navController = navController)
             }
         }
     }
 }
 
-
-
-
-@SuppressLint("UnrememberedMutableState")
+enum class WalkingState { Idle, Walking, Paused}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
+fun MapsWithPedometerScreen(
+    pedometer: Pedometer? = null,
+    stopwatch: Stopwatch? = null,
+    navController: NavHostController
+) {
     val context = LocalContext.current
     val pedometer = remember { pedometer ?: Pedometer(context) }
+    val stopwatch = remember { stopwatch ?: Stopwatch() }
 
     val stepCount by pedometer.stepCount.collectAsState()
+    val elapsedTime by stopwatch.elapsedTime.collectAsState()
 
-    val requestPermissions = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { perms ->
-        val recognitionGranted = perms[Manifest.permission.ACTIVITY_RECOGNITION] ?: false
-        if (recognitionGranted) {
-            pedometer.start()
+    var walkState by remember { mutableStateOf(WalkingState.Idle) }
+
+
+    val notifications = remember { Notifications(context).also {it.initChannel()} }
+    var isPedometerActive by remember { mutableStateOf(false) }
+    // Reset everything each time the Walk screen is shown
+    LaunchedEffect(Unit) {
+        stopwatch.stop()
+        stopwatch.reset()
+
+        pedometer.stop()
+        pedometer.reset()   // <-- ensure your Pedometer class has this
+
+        walkState = WalkingState.Idle
+        isPedometerActive = false
+    }
+
+    LaunchedEffect(isPedometerActive) {
+        if (!isPedometerActive) return@LaunchedEffect
+        while (isPedometerActive) {
+            kotlinx.coroutines.delay(5000)
+            notifications.postLevelUp("Walking leveled you up! Steps: $stepCount")
         }
     }
 
-
-        fun checkLocationPermissions() {
-
-            if (askToEnablePermissions && ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED)
-        {
-
-            Toast.makeText(
-                context,
-                "Please accept all location permissions to track your location.",
-                Toast.LENGTH_LONG
-            ).show()
-            askToEnablePermissions = false
-            return
-        }
-
-    }
-
-    checkLocationPermissions()
-
-    fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-
+    val channelIslands = LatLng(34.161767, -119.043377)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(currentLatLng, 16f)
-
+        position = CameraPosition.fromLatLngZoom(channelIslands, 13f)
     }
-
-    fusedLocationClient.lastLocation
-        .addOnSuccessListener { location : Location? ->
-            if (location != null) {
-                varLatitude = location.latitude
-                varLongitude = location.longitude
-                currentLatLng = LatLng(varLatitude, varLongitude)
-                locationFound = true
-            }
-            else if (askToEnablePermissions) {
-                Toast.makeText( context,
-                    "Please relocate or enable location services to track your location.",
-                    Toast.LENGTH_LONG)
-                .show()
-                askToEnablePermissions = false
-            }
-        }
-
-
-
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            uiSettings = MapUiSettings(zoomControlsEnabled = false),
+            uiSettings = MapUiSettings(zoomControlsEnabled = false)
         )
-        {
-            Marker(
-                state = MarkerState(position = currentLatLng),
-                title = "Current Location",
-            )
-
-        }
 
         Card(
             modifier = Modifier
@@ -172,22 +114,83 @@ fun MapsWithPedometerScreen( pedometer: Pedometer? = null) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Steps: $stepCount", style = MaterialTheme.typography.titleLarge)
+                Text(text = "Time: ${elapsedTime}s", style = MaterialTheme.typography.titleLarge)
+
                 Spacer(Modifier.height(8.dp))
+
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = { pedometer.start() }) {
-                        Text(
-                            text = "Start",
-                            fontFamily = pixelFontFamily
-                        )
-                    }
-                    Button(onClick = { pedometer.stop() }) {
-                        Text(
-                            text = "Stop",
-                            fontFamily = pixelFontFamily
-                        )
+
+                    // initial button state showing a start button
+                    when(walkState){
+                        WalkingState.Idle -> {
+                            Button(onClick = {
+                                pedometer.start()
+                                stopwatch.start()
+                                walkState = WalkingState.Walking
+                                isPedometerActive = true
+                            }) {
+                                Text(
+                                    text = "Start",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                        }
+                        WalkingState.Walking -> {
+                            Button(onClick = {
+                                pedometer.stop()
+                                stopwatch.stop()
+                                walkState = WalkingState.Paused
+                                isPedometerActive = false
+                            }) {
+                                Text(
+                                    text = "Pause",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                            Button(onClick = {
+                                pedometer.stop()
+                                stopwatch.stop()
+                                isPedometerActive = false
+
+                                navController.navigate("health_stats?steps=$stepCount&time=$elapsedTime")
+                                walkState = WalkingState.Idle
+                            }) {
+                                Text(
+                                    text = "Stop",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                        }
+                        WalkingState.Paused -> {
+                            Button(onClick = {
+                                pedometer.start()
+                                stopwatch.start()
+                                walkState = WalkingState.Walking
+                                isPedometerActive = true
+                            }) {
+                                Text(
+                                    text = "Continue",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                            Button(onClick = {
+                                pedometer.stop()
+                                stopwatch.stop()
+                                isPedometerActive = false
+
+                                navController.navigate("health_stats?steps=$stepCount&time=$elapsedTime")
+                                walkState = WalkingState.Idle
+                            }){
+                                Text(
+                                    text = "Stop",
+                                    fontFamily = pixelFontFamily
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
+

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">CrossingWRPG</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="channel_name">Game Events</string>
 </resources>

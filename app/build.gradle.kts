@@ -69,7 +69,4 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.constraintlayout)
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.activity:activity-ktx:1.11.0")
-    implementation("androidx.fragment:fragment:1.2.0")
-    implementation("com.google.android.gms:play-services-location:21.3.0")
 }
