@@ -3,7 +3,6 @@ package com.example.crossingwrpg
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AutoStories
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 // Defines all navigation screens in the app.
@@ -29,10 +28,5 @@ enum class Destination(
         route = "map_screen",
         icon = Icons.AutoMirrored.Filled.DirectionsWalk,
         contentDescription = "Walk Map Screen"
-    ),
-    HEALTH_STATS(
-    route = "health_stats",
-    icon = Icons.Default.Favorite,
-    contentDescription = "Health Stats Screen"
     );
 }

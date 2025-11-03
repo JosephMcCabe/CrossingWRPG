@@ -98,25 +98,21 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             startDestination = startDestination.route,
             modifier = Modifier.padding(contentPadding)
         ) {
-            // HOME Destination
             composable(route = Destination.HOME.route) {
                 HomePage(
                     onNavigateToStory = { navController.navigate(Destination.BATTLE.route) }
                 )
             }
-            // BATTLE Destination
             composable(route = Destination.BATTLE.route) {
                 BattleScreen(
                     onNavigateToHome = { navController.navigate(Destination.HOME.route) }
                 )
             }
-            // WALK Destination
             composable(route = Destination.WALK_MAP.route) {
                 MapsWithPedometerScreen(navController = navController)
             }
-            // STATS Destination
             composable(
-                route = Destination.HEALTH_STATS.route + "?steps={steps}&time={time}",
+                route = "health_stats?steps={steps}&time={time}",
                 arguments = listOf(
                     navArgument("steps") { type = NavType.IntType; defaultValue = 0 },
                     navArgument("time")  { type = NavType.IntType;  defaultValue = 0 }
