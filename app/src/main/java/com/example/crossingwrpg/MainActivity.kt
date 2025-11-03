@@ -87,13 +87,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 destination.icon,
                                 contentDescription = destination.contentDescription
                             )
-                        },
-                        label = {
-                            Text(
-                                destination.label,
-                                fontFamily = pixelFontFamily,
-                                fontSize = 23.sp
-                            )
                         }
                     )
                 }
