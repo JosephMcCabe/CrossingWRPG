@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.ElevatedCard
@@ -81,7 +82,7 @@ fun AchievementsScreenFunction() {
                 modifier = Modifier
             )
         }
-        Column(
+        LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
@@ -89,33 +90,35 @@ fun AchievementsScreenFunction() {
                 .background(Color.White)
         )
         {
-            AchievementCard(
+            item {
+                AchievementCard(
                 achievementName = "A New Beginning",
                 achievementDescription = "Walk 1000 steps",
-                achievementProgress = 215
-            )
+                achievementProgress = 600.0 / 1000.0
+            )}
+            item{
             AchievementCard(
                 achievementName = "Goblin Slaying",
                 achievementDescription = "Defeat 5 Evil Goblins",
-                achievementProgress = 275
-            )
-            AchievementCard(
+                achievementProgress = 5.0 / 5.0
+            )}
+            item{
+                AchievementCard(
                 achievementName = "A Step Up",
                 achievementDescription = "Walk 100,000 Steps",
-                achievementProgress = 15
-            )
-
-            AchievementCard(
+                achievementProgress = 600.0 / 100000.0
+            )}
+            item{
+                AchievementCard(
                 achievementName = "???",
                 achievementDescription = "Progress in the story to unlock",
-                achievementProgress = 45
-            )
+                achievementProgress = 15.0 / 100.0
+            )}
         }
         Box(modifier = Modifier) {
             Column(
                 verticalArrangement = Arrangement.Bottom,
                 modifier = Modifier.fillMaxSize()
-
             ) {
                 ElevatedCard(
                     modifier = Modifier
@@ -143,9 +146,11 @@ fun AchievementsScreenFunction() {
 fun AchievementCard(
     achievementName: String,
     achievementDescription: String,
-    achievementProgress: Int,
+    achievementProgress: Double,
 ) {
-    val achievementPercentCompleted = (achievementProgress).toFloat()
+    var achievementPercentCompleted = achievementProgress
+    achievementPercentCompleted = (achievementPercentCompleted * 100)
+    achievementPercentCompleted = (achievementPercentCompleted * 2.75)
     ElevatedCard(modifier = Modifier
         .padding(bottom = 15.dp)
         .width(275.dp)
