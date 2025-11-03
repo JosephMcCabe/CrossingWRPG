@@ -87,13 +87,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 destination.icon,
                                 contentDescription = destination.contentDescription
                             )
-                        },
-                        label = {
-                            Text(
-                                destination.label,
-                                fontFamily = pixelFontFamily,
-                                fontSize = 23.sp
-                            )
                         }
                     )
                 }
@@ -108,13 +101,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             // HOME Destination
             composable(route = Destination.HOME.route) {
                 HomePage(
-                    onNavigateToStory = { navController.navigate(Destination.BATTLE.route) }
+                    onNavigateToStory = { navController.navigate(Destination.BATTLE.route) },
+                    battleSimulation = BattleSimulation()
                 )
             }
             // BATTLE Destination
             composable(route = Destination.BATTLE.route) {
                 BattleScreen(
-                    onNavigateToHome = { navController.navigate(Destination.HOME.route) }
+                    onNavigateToHome = { navController.navigate(Destination.HOME.route) },
+                    battleSimulation = BattleSimulation()
                 )
             }
             // WALK Destination

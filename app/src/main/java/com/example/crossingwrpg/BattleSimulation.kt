@@ -157,28 +157,3 @@ class BattleSimulation {
         battleState.value = BattleState.Start
     }
 }
-
-fun main() {
-
-    val simulation = BattleSimulation()
-    val stepsPerWalk = 50L // Simulate walking 50 steps at a time
-    val targetSpeed = 20
-    var currentSteps = 0L
-
-    println("--- Starting  Walk Test ---")
-    println("Initial Speed: ${simulation.walkSpeed}")
-    println("Steps needed per point: ${simulation.stepsPerSpeedPoint}")
-    println("---------------------------")
-
-    // Continuous loop until the target speed is reached
-    while (simulation.walkSpeed < targetSpeed) {
-        currentSteps += stepsPerWalk
-        println("\nSimulating a walk of $stepsPerWalk steps")
-        simulation.updateSteps(currentSteps)
-    }
-
-    println("\n--- Test Complete ---")
-    println("Final Speed: ${simulation.walkSpeed}")
-    println("Total Steps taken: ${simulation.totalSteps}")
-    println("---------------------")
-}
