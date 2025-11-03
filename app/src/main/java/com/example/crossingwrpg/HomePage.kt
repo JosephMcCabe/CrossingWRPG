@@ -89,7 +89,7 @@ fun HomePage(onNavigateToStory: () -> Unit) {
             modifier = Modifier.fillMaxSize()
                 .padding(top = 128.dp)
                 .padding(16.dp)
-
+                
         )
         {
             Column(
