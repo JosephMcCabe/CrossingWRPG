@@ -170,7 +170,7 @@ fun AchievementCard(
             color = Color.DarkGray,
             modifier = Modifier
         )
-        if (achievementPercentCompleted >= 275.0) {
+        if (achievementPercentCompleted < 275.0) {
             LinearProgressIndicator(
                 progress = { 1F },
                 modifier = Modifier
