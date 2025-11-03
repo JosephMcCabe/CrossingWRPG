@@ -23,16 +23,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 
 
@@ -52,8 +48,6 @@ class AchievementsScreen : ComponentActivity() {
 @Preview
 @Composable
 fun AchievementsScreenFunction() {
-
-    var currentAchievementProgress by remember { mutableFloatStateOf(255f) }
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -148,9 +142,12 @@ fun AchievementCard(
     achievementDescription: String,
     achievementProgress: Double,
 ) {
+    //Set Achievement progress bar to accurately show progress
     var achievementPercentCompleted = achievementProgress
     achievementPercentCompleted = (achievementPercentCompleted * 100)
     achievementPercentCompleted = (achievementPercentCompleted * 2.75)
+
+
     ElevatedCard(modifier = Modifier
         .padding(bottom = 15.dp)
         .width(275.dp)
@@ -173,13 +170,25 @@ fun AchievementCard(
             color = Color.DarkGray,
             modifier = Modifier
         )
-        LinearProgressIndicator(
-            progress = { 1F },
-            modifier = Modifier
-                .padding(vertical = 1.dp)
-                .height(10.dp)
-                .width(achievementPercentCompleted.dp)
+        if (achievementPercentCompleted >= 275.0) {
+            LinearProgressIndicator(
+                progress = { 1F },
+                modifier = Modifier
+                    .padding(vertical = 1.dp)
+                    .height(10.dp)
+                    .width(achievementPercentCompleted.dp)
 
-        )
+            )
+        }
+        else {
+            Text(
+                text = " Completed! ",
+                fontFamily = pixelFontFamily,
+                fontSize = 30.sp,
+                color = Color.DarkGray,
+                modifier = Modifier
+            )
+
+        }
     }
 }
