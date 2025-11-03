@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -51,6 +54,98 @@ data class Character(
     val speed: Int,
     val mind: Int
 )
+
+class BattleSimulation(
+    val playerState: MutableState<Character>,
+    val enemyState: MutableState<Character>
+) {
+    var state: MutableState<BattleState> = mutableStateOf(BattleState.Start)
+        private set
+
+    private val player: Character get() = playerState.value
+    private val enemy: Character get() = enemyState.value
+    fun advanceBattle() {
+        when (state.value) {
+            is BattleState.Start -> state.value = BattleState.Intro
+            is BattleState.Intro ->firstTurn()
+
+            is BattleState.PlayerAttack -> {
+                state.value = checkForWinOrNext(BattleState.EnemyTurn)
+            }
+
+            // Heals player and moves to enemy turn
+            is BattleState.PlayerHeal-> {
+                state.value = BattleState.EnemyTurn
+            }
+
+            // attacks player then checks conditions for next state
+            is BattleState.EnemyTurn -> {
+                enemyAttack()
+                state.value = checkForWinOrNext(BattleState.PlayerTurn)
+            }
+
+            else -> {}
+        }
+    }
+
+    // determines the first turn based on who in the turn order is faster
+    fun firstTurn() {
+        state.value = if (player.speed < enemy.speed) {
+            BattleState.EnemyTurn
+        }
+        else {
+            BattleState.PlayerTurn
+        }
+    }
+
+    fun playerAttack() {
+        enemyState.value = enemy.copy(currentHealth = enemy.currentHealth - player.strength)
+    }
+
+    fun playerHeal() {
+        var newHealth = player.currentHealth + player.mind
+        if (newHealth > player.maxHealth) {
+            newHealth = player.maxHealth
+        }
+        playerState.value = player.copy(currentHealth = newHealth)
+    }
+
+    fun enemyAttack() {
+        playerState.value = player.copy(currentHealth = player.currentHealth - enemy.strength)
+    }
+
+    fun checkForWinOrNext(nextState: BattleState): BattleState {
+        return when {
+            enemy.currentHealth <= 0 -> {
+                BattleState.End("${player.name} defeated ${enemy.name}!")
+            }
+            player.currentHealth <= 0 -> {
+                BattleState.End("${player.name} was defeated by ${enemy.name}...")
+            }
+            else -> nextState
+        }
+    }
+
+    fun chooseAction(action: BattleState) {
+        when (action) {
+            is BattleState.PlayerAttack -> {
+                this.playerAttack()
+                state.value = BattleState.PlayerAttack
+            }
+            is BattleState.PlayerHeal -> {
+                this.playerHeal()
+                state.value = BattleState.PlayerHeal
+            }
+            else -> {}
+        }
+    }
+
+    fun reset() {
+        playerState.value = Character("Fatima", 100, 100,25, 11, 15)
+        enemyState.value = Character("Evil Goblin thing",150, 150, 15, 5, 0)
+        state.value = BattleState.Start
+    }
+}
 
 @Composable
 fun CharacterHealthBar(character: Character, modifier: Modifier = Modifier, isPlayer: Boolean) {
@@ -91,11 +186,22 @@ fun CharacterHealthBar(character: Character, modifier: Modifier = Modifier, isPl
 }
 
 @Composable
-fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Unit) {
+fun BattleScreen(onNavigateToHome: () -> Unit) {
 
-    val player by battleSimulation.playerState
-    val enemy by battleSimulation.enemyState
-    val state by battleSimulation.battleState
+    val playerState = remember { mutableStateOf(Character("Fatima", 100, 100, 25, 11, 15)) }
+    val enemyState = remember { mutableStateOf(Character("Evil Goblin thing", 150, 150, 15, 5, 0)) }
+
+    // remember battle simulation
+    val battleSimulation = remember {
+        BattleSimulation(
+            playerState = playerState,
+            enemyState = enemyState
+        )
+    }
+
+    val player by playerState
+    val enemy by enemyState
+    val state by battleSimulation.state
 
     fun nextTurn() {
         battleSimulation.advanceBattle()
@@ -174,15 +280,16 @@ fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Uni
                         )
 
                         is BattleState.PlayerAttack -> PixelText(
-                            text = "You attacked ${enemy.name} for ${battleSimulation.playerStrength} damage!",
+                            text = "You attacked ${enemy.name} for ${player.strength} damage!",
                         )
 
                         is BattleState.PlayerHeal -> PixelText(
                             text = "You healed for ${player.mind} HP!"
                         )
 
+
                         is BattleState.EnemyTurn -> PixelText(
-                            text = "You are attacked by the ${enemy.name} for ${battleSimulation.enemyStrength} damage!",
+                            text = "You are attacked by the ${enemy.name} for ${enemy.strength} damage!",
                         )
 
                         is BattleState.End -> {
@@ -229,7 +336,6 @@ fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Uni
                             Button(
                                 onClick = {
                                     battleSimulation.chooseAction(BattleState.PlayerAttack)
-                                    nextTurn()
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Red,
@@ -255,7 +361,6 @@ fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Uni
                             Button(
                                 onClick = {
                                     battleSimulation.chooseAction(BattleState.PlayerHeal)
-                                    nextTurn()
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,
@@ -282,7 +387,7 @@ fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Uni
                     is BattleState.End -> {
                         Button(
                             onClick = {
-                                battleSimulation.resetBattle()
+                                battleSimulation.reset()
                                 onNavigateToHome()
                             },
                             colors = ButtonDefaults.buttonColors(

@@ -28,4 +28,9 @@ class Stopwatch {
     fun stop() {
         timerJob?.cancel()
     }
+
+    fun reset() {
+        timerJob?.cancel()
+        timer.value = 0
+    }
 }

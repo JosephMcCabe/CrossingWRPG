@@ -14,6 +14,8 @@ class Pedometer(context: Context): SensorEventListener {
     private val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     private val counter = MutableStateFlow(0L)
     val stepCount = counter.asStateFlow()
+    private var baseReading: Int? = null
+
 
     fun start() {
         sensor ?.let {
@@ -23,6 +25,11 @@ class Pedometer(context: Context): SensorEventListener {
 
     fun stop() {
         sensorManager.unregisterListener(this)
+    }
+
+    fun reset() {
+        baseReading = null
+        counter.value = 0
     }
 
     override fun onSensorChanged(sensorEvent: SensorEvent?) {
