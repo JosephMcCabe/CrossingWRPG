@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 class BattleSimulation {
-    val stepsPerSpeedPoint = 10L
+    val stepsPerSpeedPoint = 10
     var totalSteps: Long by mutableLongStateOf(0L)
         private set
     var walkSpeed: Int by mutableIntStateOf(1)
@@ -50,7 +50,7 @@ class BattleSimulation {
             maxHealth = 150,
             currentHealth = 150,
             strength = 15,
-            speed = 5,
+            speed = 2,
             mind = 0
         )
     }
@@ -65,7 +65,6 @@ class BattleSimulation {
 
         val stepsTowardsNext = stepsSinceLastSpeedIncrease + stepsGained
         val speedIncrease = (stepsTowardsNext / stepsPerSpeedPoint).toInt()
-        val stepsRemaining = stepsTowardsNext % stepsPerSpeedPoint
 
         var speedChanged = false
 
@@ -73,7 +72,6 @@ class BattleSimulation {
             walkSpeed += speedIncrease
             speedChanged = true
         }
-        stepsSinceLastSpeedIncrease = stepsRemaining
 
         if(speedChanged || player.speed != walkSpeed) {
             playerState.value = player.copy(speed = walkSpeed)
@@ -86,12 +84,10 @@ class BattleSimulation {
             is BattleState.Intro -> firstTurn()
 
             is BattleState.PlayerAttack -> {
-                playerAttack()
                 battleState.value = checkForWinOrNext(BattleState.EnemyTurn)
             }
 
             is BattleState.PlayerHeal -> {
-                playerHeal()
                 battleState.value = checkForWinOrNext(BattleState.EnemyTurn)
             }
 
@@ -142,9 +138,11 @@ class BattleSimulation {
     fun chooseAction(action: BattleState) {
         when (action) {
             is BattleState.PlayerAttack -> {
+                this.playerAttack()
                 battleState.value = BattleState.PlayerAttack
             }
             is BattleState.PlayerHeal -> {
+                this.playerHeal()
                 battleState.value = BattleState.PlayerHeal
             }
             else -> {}

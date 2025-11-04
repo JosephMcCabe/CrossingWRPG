@@ -229,7 +229,6 @@ fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Uni
                             Button(
                                 onClick = {
                                     battleSimulation.chooseAction(BattleState.PlayerAttack)
-                                    nextTurn()
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Red,
@@ -255,7 +254,6 @@ fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Uni
                             Button(
                                 onClick = {
                                     battleSimulation.chooseAction(BattleState.PlayerHeal)
-                                    nextTurn()
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,

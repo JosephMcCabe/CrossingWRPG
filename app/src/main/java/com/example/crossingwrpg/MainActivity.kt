@@ -15,8 +15,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -50,6 +53,21 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
+
+    val context = LocalContext.current
+    val battleSimulation = remember {
+        BattleSimulation()
+    }
+    val pedometer = remember {
+        Pedometer(
+            context = context.applicationContext,
+            battleSimulation =  battleSimulation
+        )
+    }
+    val stopwatch = remember {
+        Stopwatch()
+    }
+
     // Define initial screen when opening app
     val startDestination = Destination.HOME
 
@@ -57,6 +75,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val baseRoute = currentRoute?.substringBefore("?")
+
+    DisposableEffect(pedometer) {
+        pedometer.start()
+        onDispose {
+            pedometer.stop()
+        }
+    }
 
     // Scaffold provides overall screen structure
     Scaffold(
@@ -98,35 +123,40 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             startDestination = startDestination.route,
             modifier = Modifier.padding(contentPadding)
         ) {
-            // HOME Destination
             composable(route = Destination.HOME.route) {
                 HomePage(
                     onNavigateToStory = { navController.navigate(Destination.BATTLE.route) },
-                    battleSimulation = BattleSimulation()
+                    battleSimulation = battleSimulation
                 )
             }
-            // BATTLE Destination
             composable(route = Destination.BATTLE.route) {
                 BattleScreen(
                     onNavigateToHome = { navController.navigate(Destination.HOME.route) },
-                    battleSimulation = BattleSimulation()
+                    battleSimulation = battleSimulation
                 )
             }
-            // WALK Destination
             composable(route = Destination.WALK_MAP.route) {
-                MapsWithPedometerScreen(navController = navController)
+                MapsWithPedometerScreen(
+                    navController = navController,
+                    pedometer = pedometer,
+                    stopwatch = stopwatch
+                )
             }
-            // STATS Destination
             composable(
-                route = "health_stats?steps={steps}&time={time}",
+                route = "health_stats?steps={steps}&time={time}&totalSteps={totalSteps}",
                 arguments = listOf(
                     navArgument("steps") { type = NavType.IntType; defaultValue = 0 },
-                    navArgument("time")  { type = NavType.IntType;  defaultValue = 0 }
+                    navArgument("time")  { type = NavType.IntType;  defaultValue = 0 },
+                    navArgument("totalSteps") { type = NavType.LongType; defaultValue = 0L }
                 )
             ) { backStackEntry ->
                 val steps = backStackEntry.arguments?.getInt("steps") ?: 0
                 val time  = backStackEntry.arguments?.getInt("time") ?: 0
-                HealthStatsScreen(steps = steps, time = time)
+                val totalSteps = backStackEntry.arguments?.getLong("totalSteps") ?: 0L
+                HealthStatsScreen(
+                    steps = steps,
+                    time = time,
+                    totalSteps = totalSteps)
             }
         }
     }

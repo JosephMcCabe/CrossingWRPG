@@ -8,7 +8,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HealthStatsScreen(steps: Int = 0, time: Int = 0) {
+fun HealthStatsScreen(
+    steps: Int = 0,
+    time: Int = 0,
+    totalSteps: Long = 0
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -29,6 +33,10 @@ fun HealthStatsScreen(steps: Int = 0, time: Int = 0) {
             )
             PixelText(
                 "Time elapsed: ${time}s",
+                fontSize = 35.sp,
+            )
+            PixelText(
+                "Total steps: $totalSteps",
                 fontSize = 35.sp,
             )
             Spacer(Modifier.height(32.dp))
