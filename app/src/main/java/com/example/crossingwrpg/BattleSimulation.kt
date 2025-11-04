@@ -35,7 +35,7 @@ class BattleSimulation {
 
     fun createPlayerCharacter(): Character {
         return Character(
-            name = "Joey",
+            name = "Fatima",
             maxHealth = baseMaxHealth,
             currentHealth = baseMaxHealth,
             strength = baseStrength,

@@ -15,11 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,8 +28,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.CameraPosition
@@ -105,6 +107,9 @@ fun MapsWithPedometerScreen(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .padding(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
@@ -113,8 +118,8 @@ fun MapsWithPedometerScreen(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Steps: $stepCount", style = MaterialTheme.typography.titleLarge)
-                Text(text = "Time: ${elapsedTime}s", style = MaterialTheme.typography.titleLarge)
+                PixelText(text = "Steps: $stepCount", fontSize = 30.sp)
+                PixelText(text = "Time: ${elapsedTime}s", fontSize = 30.sp)
 
                 Spacer(Modifier.height(8.dp))
 
@@ -123,67 +128,97 @@ fun MapsWithPedometerScreen(
                     // initial button state showing a start button
                     when(walkState){
                         WalkingState.Idle -> {
-                            Button(onClick = {
-                                pedometer.start()
-                                stopwatch.start()
-                                walkState = WalkingState.Walking
-                                isPedometerActive = true
-                            }) {
-                                Text(
+                            Button(
+                                onClick = {
+                                    pedometer.start()
+                                    stopwatch.start()
+                                    walkState = WalkingState.Walking
+                                    isPedometerActive = true
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Green,
+                                    contentColor = Color.Black
+                                )
+                            ) {
+                                PixelText(
                                     text = "Start",
-                                    fontFamily = pixelFontFamily
+                                    fontSize = 25.sp
                                 )
                             }
                         }
                         WalkingState.Walking -> {
-                            Button(onClick = {
-                                pedometer.stop()
-                                stopwatch.stop()
-                                walkState = WalkingState.Paused
-                                isPedometerActive = false
-                            }) {
-                                Text(
+                            Button(
+                                onClick = {
+                                    pedometer.stop()
+                                    stopwatch.stop()
+                                    walkState = WalkingState.Paused
+                                    isPedometerActive = false
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Yellow,
+                                    contentColor = Color.Black
+                                )
+                            ) {
+                                PixelText(
                                     text = "Pause",
-                                    fontFamily = pixelFontFamily
+                                    fontSize = 25.sp
                                 )
                             }
-                            Button(onClick = {
-                                pedometer.stop()
-                                stopwatch.stop()
-                                isPedometerActive = false
+                            Button(
+                                onClick = {
+                                    pedometer.stop()
+                                    stopwatch.stop()
+                                    isPedometerActive = false
 
-                                navController.navigate("health_stats?steps=$stepCount&time=$elapsedTime")
-                                walkState = WalkingState.Idle
-                            }) {
-                                Text(
+                                    navController.navigate("health_stats?steps=$stepCount&time=$elapsedTime")
+                                    walkState = WalkingState.Idle
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red,
+                                    contentColor = Color.Black
+                                )
+                            ) {
+                                PixelText(
                                     text = "Stop",
-                                    fontFamily = pixelFontFamily
+                                    fontSize = 25.sp
                                 )
                             }
                         }
                         WalkingState.Paused -> {
-                            Button(onClick = {
-                                pedometer.start()
-                                stopwatch.start()
-                                walkState = WalkingState.Walking
-                                isPedometerActive = true
-                            }) {
-                                Text(
+                            Button(
+                                onClick = {
+                                    pedometer.start()
+                                    stopwatch.start()
+                                    walkState = WalkingState.Walking
+                                    isPedometerActive = true
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Green,
+                                    contentColor = Color.Black
+                                )
+                            ) {
+                                PixelText(
                                     text = "Continue",
-                                    fontFamily = pixelFontFamily
+                                    fontSize = 25.sp
                                 )
                             }
-                            Button(onClick = {
-                                pedometer.stop()
-                                stopwatch.stop()
-                                isPedometerActive = false
+                            Button(
+                                onClick = {
+                                    pedometer.stop()
+                                    stopwatch.stop()
+                                    isPedometerActive = false
 
-                                navController.navigate("health_stats?steps=$stepCount&time=$elapsedTime")
-                                walkState = WalkingState.Idle
-                            }){
-                                Text(
+                                    navController.navigate("health_stats?steps=$stepCount&time=$elapsedTime")
+                                    walkState = WalkingState.Idle
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color.Red,
+                                        contentColor = Color.Black
+                                    )
+                                ) {
+                                PixelText(
                                     text = "Stop",
-                                    fontFamily = pixelFontFamily
+                                    fontSize = 25.sp
                                 )
                             }
                         }
