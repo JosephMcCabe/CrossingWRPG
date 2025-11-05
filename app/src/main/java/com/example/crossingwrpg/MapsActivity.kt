@@ -65,16 +65,19 @@ fun MapsWithPedometerScreen(
 
     var walkState by remember { mutableStateOf(WalkingState.Idle) }
 
+    val fallback = LatLng(34.161767, -119.043377)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(fallback, 13f)
+    }
 
     val notifications = remember { Notifications(context).also {it.initChannel()} }
     var isPedometerActive by remember { mutableStateOf(false) }
-    // Reset everything each time the Walk screen is shown
     LaunchedEffect(Unit) {
         stopwatch.stop()
         stopwatch.reset()
 
         pedometer.stop()
-        pedometer.reset()   // <-- ensure your Pedometer class has this
+        pedometer.reset()
 
         walkState = WalkingState.Idle
         isPedometerActive = false
@@ -86,11 +89,6 @@ fun MapsWithPedometerScreen(
             kotlinx.coroutines.delay(5000)
             notifications.postLevelUp("Walking leveled you up! Steps: $stepCount")
         }
-    }
-
-    val channelIslands = LatLng(34.161767, -119.043377)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(channelIslands, 13f)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
