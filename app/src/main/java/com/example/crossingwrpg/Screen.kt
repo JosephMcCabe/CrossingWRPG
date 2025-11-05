@@ -11,19 +11,16 @@ enum class Destination(
     val icon: ImageVector,
     val contentDescription: String
 ) {
-    // Story/Battle Screen
     BATTLE(
         route = "story_page",
         icon = Icons.Default.AutoStories,
         contentDescription = "Battle Screen"
     ),
-    // Main app home screen
     HOME(
         route = "home_page",
         icon = Icons.Default.Home,
         contentDescription = "Home Screen"
     ),
-    // Map or walk screen
     WALK_MAP(
         route = "map_screen",
         icon = Icons.AutoMirrored.Filled.DirectionsWalk,
