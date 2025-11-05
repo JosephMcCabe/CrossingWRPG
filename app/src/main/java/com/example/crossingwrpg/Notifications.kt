@@ -55,4 +55,5 @@ class Notifications(private val context: Context) {
 
         NotificationManagerCompat.from(context).notify(1001, levelUpNotification)
     }
+
 }
