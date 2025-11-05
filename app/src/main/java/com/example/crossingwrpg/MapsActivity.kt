@@ -214,8 +214,8 @@ fun MapsWithPedometerScreen(
                                     isPedometerActive = false
                                 },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Yellow,
-                                    contentColor = Color.Black
+                                    containerColor = Color.Black,
+                                    contentColor = Color.White
                                 )
                             ) {
                                 PixelText(
