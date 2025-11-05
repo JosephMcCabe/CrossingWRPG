@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 
 // A main menu screen displaying the character, game title, and navigation bar.
 @Composable
-fun HomePage(onNavigateToStory: () -> Unit) {
+fun HomePage(battleSimulation: BattleSimulation, onNavigateToStory: () -> Unit) {
     val requestPermissions = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) {}

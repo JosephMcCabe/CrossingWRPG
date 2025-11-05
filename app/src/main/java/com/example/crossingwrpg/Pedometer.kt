@@ -7,13 +7,15 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 
 
-class Pedometer(context: Context): SensorEventListener {
+class Pedometer(
+    context: Context,
+    private val battleSimulation: BattleSimulation
+): SensorEventListener {
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-    private val counter = MutableStateFlow(0)
+    private val counter = MutableStateFlow(0L)
     val stepCount = counter.asStateFlow()
     private var baseReading: Int? = null
 
@@ -28,15 +30,12 @@ class Pedometer(context: Context): SensorEventListener {
         sensorManager.unregisterListener(this)
     }
 
-    fun reset() {
-        baseReading = null
-        counter.value = 0
-    }
-
     override fun onSensorChanged(sensorEvent: SensorEvent?) {
         sensorEvent?.let { event ->
             if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-                counter.update { it.plus(1) }
+                val totalSteps = event.values[0].toLong()
+                counter.value = totalSteps
+                battleSimulation.updateSteps(totalSteps)
             }
         }
     }
