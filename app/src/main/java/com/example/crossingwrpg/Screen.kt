@@ -22,8 +22,8 @@ enum class Destination(
         contentDescription = "Home Screen"
     ),
     WALK_MAP(
-        route = "walk_screen",
+        route = "map_screen",
         icon = Icons.AutoMirrored.Filled.DirectionsWalk,
         contentDescription = "Walk Map Screen"
-    )
+    );
 }

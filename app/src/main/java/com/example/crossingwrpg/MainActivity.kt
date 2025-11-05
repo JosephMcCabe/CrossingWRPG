@@ -144,6 +144,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
             composable(
                 route = "health_stats?steps={steps}&time={time}&totalSteps={totalSteps}",
+              
                 arguments = listOf(
                     navArgument("steps") { type = NavType.IntType; defaultValue = 0 },
                     navArgument("time")  { type = NavType.IntType;  defaultValue = 0 },
