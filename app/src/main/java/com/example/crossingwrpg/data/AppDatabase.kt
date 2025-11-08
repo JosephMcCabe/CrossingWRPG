@@ -7,7 +7,7 @@ import android.content.Context
 
 @Database(entities = [User::class], version = 1, exportSchema = true)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun userStatsDao(): UserStatsDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile
