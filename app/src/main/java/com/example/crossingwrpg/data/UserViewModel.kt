@@ -32,4 +32,8 @@ class UserViewModel(app: Application) : AndroidViewModel(app) {
     fun saveName(name: String) = viewModelScope.launch {
         repo.createOrUpdateName(name.trim())
     }
+
+    fun recordWalk(steps: Int) = viewModelScope.launch {
+        repo.addWalk(steps)
+    }
 }

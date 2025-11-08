@@ -10,7 +10,11 @@ class UserRepository(private val dao: UserDao) {
         if (current == null) {
             dao.insert(User(uid = 1, name = name))
         } else {
-            dao.updateName(1, name)
+            dao.updateName(name)
         }
+    }
+
+    suspend fun addWalk(steps: Int) {
+        dao.addToTotalSteps(steps)
     }
 }

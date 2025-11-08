@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class User (
     @PrimaryKey val uid: Int = 1,
     val name: String,
-    val totalSteps: Int = 0,
+    val totalSteps: Long = 0,
     val totalWalkingSeconds: Int = 0
 
 )

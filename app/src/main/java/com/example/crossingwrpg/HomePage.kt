@@ -36,9 +36,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 // A main menu screen displaying the character, game title, and navigation bar.
 @Composable
 fun HomePage(onNavigateToStory: () -> Unit) {
-    val vm: com.example.crossingwrpg.data.UserViewModel = viewModel()
-    val needsName by vm.needsName.collectAsState()
-    val user by vm.userFlow.collectAsState()
+    val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
+    val needsName by userVm.needsName.collectAsState()
+    val user by userVm.userFlow.collectAsState()
 
     val requestPermissions = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -56,7 +56,7 @@ fun HomePage(onNavigateToStory: () -> Unit) {
     }
 
     if (needsName) {
-        NameDialog(onConfirm = { name -> vm.saveName(name) })
+        NameDialog(onConfirm = { name -> userVm.saveName(name) })
     }
 
     // Box used to stack main character image, title, and buttons

@@ -17,6 +17,9 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(stats: User)
 
-    @Query("UPDATE user SET name = :name WHERE uid = :id")
-    suspend fun updateName(id: Int = 1, name: String)
+    @Query("UPDATE user SET name = :name WHERE uid = 1")
+    suspend fun updateName(name: String)
+
+    @Query("UPDATE user SET totalSteps = totalSteps + :addSteps WHERE uid = 1")
+    suspend fun addToTotalSteps(addSteps: Int)
 }
