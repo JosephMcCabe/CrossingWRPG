@@ -13,10 +13,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun HealthStatsScreen(
     steps: Int = 0,
     time: Int = 0,
-    totalSteps: Long = 0
 ) {
-    val UserVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
-    val user = UserVm.userFlow.collectAsState(initial = null).value
+    val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
+    val user = userVm.userFlow.collectAsState(initial = null).value
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -43,6 +42,10 @@ fun HealthStatsScreen(
             PixelText(
                 "Total steps: ${user?.totalSteps ?: 0}",
                 fontSize = 35.sp,
+            )
+            PixelText(
+                "Total time: ${user?.totalWalkingSeconds ?: 0}",
+                fontSize = 35.sp
             )
             Spacer(Modifier.height(32.dp))
         }

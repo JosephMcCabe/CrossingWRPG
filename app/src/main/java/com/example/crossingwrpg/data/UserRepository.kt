@@ -17,4 +17,8 @@ class UserRepository(private val dao: UserDao) {
     suspend fun addWalk(steps: Int) {
         dao.addToTotalSteps(steps)
     }
+
+    suspend fun addSecs(seconds: Int) {
+        dao.addToTotalTime(seconds)
+    }
 }

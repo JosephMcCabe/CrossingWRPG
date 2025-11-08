@@ -231,7 +231,7 @@ fun MapsWithPedometerScreen(
                                     stopwatch.stop()
                                     isPedometerActive = false
 
-                                    userVm.recordWalk(sessionSteps.toInt())
+                                    userVm.recordWalk(sessionSteps.toInt(), elapsedTime)
 
                                     navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime")
                                     walkState = WalkingState.Idle

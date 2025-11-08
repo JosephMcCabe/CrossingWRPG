@@ -108,7 +108,7 @@ fun HomePage(onNavigateToStory: () -> Unit) {
             fontSize = 25.sp,
             color = Color.DarkGray,
             modifier = Modifier
-                .align(Alignment.TopCenter)
+                .align(Alignment.BottomCenter)
                 .padding(top = 76.dp)
                 .padding(16.dp)
         )

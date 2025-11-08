@@ -22,4 +22,7 @@ interface UserDao {
 
     @Query("UPDATE user SET totalSteps = totalSteps + :addSteps WHERE uid = 1")
     suspend fun addToTotalSteps(addSteps: Int)
+
+    @Query("UPDATE user SET totalWalkingSeconds = totalWalkingSeconds + :addSeconds WHERE uid = 1")
+    suspend fun addToTotalTime(addSeconds: Int)
 }
