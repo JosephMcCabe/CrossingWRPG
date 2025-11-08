@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,10 +31,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 // A main menu screen displaying the character, game title, and navigation bar.
 @Composable
-fun HomePage(battleSimulation: BattleSimulation, onNavigateToStory: () -> Unit) {
+fun HomePage(onNavigateToStory: () -> Unit) {
+    val vm: com.example.crossingwrpg.data.UserViewModel = viewModel()
+    val needsName by vm.needsName.collectAsState()
+    val user by vm.userFlow.collectAsState()
 
     val requestPermissions = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -49,6 +54,11 @@ fun HomePage(battleSimulation: BattleSimulation, onNavigateToStory: () -> Unit) 
             )
         )
     }
+
+    if (needsName) {
+        NameDialog(onConfirm = { name -> vm.saveName(name) })
+    }
+
     // Box used to stack main character image, title, and buttons
     Box(
         modifier = Modifier.fillMaxSize()
@@ -82,6 +92,17 @@ fun HomePage(battleSimulation: BattleSimulation, onNavigateToStory: () -> Unit) 
         )
         Text(
             text = "A Walking RPG",
+            fontFamily = pixelFontFamily,
+            textAlign = TextAlign.Center,
+            fontSize = 25.sp,
+            color = Color.DarkGray,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 76.dp)
+                .padding(16.dp)
+        )
+        Text(
+            text = "Hi, ${user?.name ?: "Walker"}",
             fontFamily = pixelFontFamily,
             textAlign = TextAlign.Center,
             fontSize = 25.sp,
