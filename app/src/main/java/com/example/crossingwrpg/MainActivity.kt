@@ -156,6 +156,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     steps = steps,
                     time = time)
             }
+            composable(route = Destination.ACHIEVEMENTS_SCREEN.route) {
+                AchievementsScreenFunction(navController = navController)
+            }
         }
     }
 }
