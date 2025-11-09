@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.CameraPosition
@@ -73,6 +74,7 @@ fun MapsWithPedometerScreen(
     stopwatch: Stopwatch,
     navController: NavHostController
 ) {
+    val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
     val context = LocalContext.current
     val totalStepCount by pedometer.stepCount.collectAsState()
     val elapsedTime by stopwatch.elapsedTime.collectAsState()
@@ -229,7 +231,9 @@ fun MapsWithPedometerScreen(
                                     stopwatch.stop()
                                     isPedometerActive = false
 
-                                    navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime&totalSteps=$totalStepCount")
+                                    userVm.recordWalk(sessionSteps.toInt(), elapsedTime)
+
+                                    navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime")
                                     walkState = WalkingState.Idle
                                 },
                                 colors = ButtonDefaults.buttonColors(
@@ -240,9 +244,9 @@ fun MapsWithPedometerScreen(
                                 PixelText(
                                     text = "Stop",
                                     fontSize = 25.sp
-                                    )
-                                }
+                                )
                             }
+                        }
                         WalkingState.Paused -> {
                             Button(
                                 onClick = {
@@ -267,14 +271,13 @@ fun MapsWithPedometerScreen(
                                     stopwatch.stop()
                                     isPedometerActive = false
 
-                                    navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime&totalSteps=$totalStepCount")
                                     walkState = WalkingState.Idle
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.Red,
-                                        contentColor = Color.Black
-                                    )
-                                ) {
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red,
+                                    contentColor = Color.Black
+                                )
+                            ) {
                                 PixelText(
                                     text = "Stop",
                                     fontSize = 25.sp

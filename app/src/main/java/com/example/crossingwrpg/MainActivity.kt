@@ -126,7 +126,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             composable(route = Destination.HOME.route) {
                 HomePage(
                     onNavigateToStory = { navController.navigate(Destination.BATTLE.route) },
-                    battleSimulation = battleSimulation
                 )
             }
             composable(route = Destination.BATTLE.route) {
@@ -153,11 +152,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             ) { backStackEntry ->
                 val steps = backStackEntry.arguments?.getInt("steps") ?: 0
                 val time  = backStackEntry.arguments?.getInt("time") ?: 0
-                val totalSteps = backStackEntry.arguments?.getLong("totalSteps") ?: 0L
                 HealthStatsScreen(
                     steps = steps,
-                    time = time,
-                    totalSteps = totalSteps)
+                    time = time)
+            }
+            composable(route = Destination.ACHIEVEMENTS_SCREEN.route) {
+                AchievementsScreenFunction(navController = navController)
             }
         }
     }
