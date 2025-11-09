@@ -18,6 +18,8 @@
     <!-- Post Notification Permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
+
 
     <application
         android:allowBackup="true"
@@ -49,10 +51,10 @@
             android:exported="true"
             android:label="@string/title_activity_maps"
             android:theme="@style/Theme.AppCompat.Light">
-
-
-
         </activity>
+        <service
+            android:name=".PedometerForegroundServices"
+            android:foregroundServiceType="health">
+        </service>
     </application>
-
 </manifest>
