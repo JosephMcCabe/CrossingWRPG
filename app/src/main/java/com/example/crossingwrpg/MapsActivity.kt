@@ -65,10 +65,8 @@ fun MapsWithPedometerScreen(
     var earnedItemsList by remember {
         mutableStateOf(emptyList<EarnedItem>())
     }
-    var hasInitialOffsetBeenSet by remember { mutableStateOf(false) }
 
     val sessionSteps = (totalStepCount - initialSessionSteps).coerceAtLeast(0L)
-
 
     val notifications = remember { Notifications(context).also { it.initChannel() } }
 
@@ -78,18 +76,9 @@ fun MapsWithPedometerScreen(
         walkingStateManager.isPedometerActive = isPedometerActive
     }
 
-    LaunchedEffect(totalStepCount) {
-        if (totalStepCount > 0L) {
-            initialSessionSteps = walkingStateManager.initialSessionSteps
-        }
-    }
-
-    LaunchedEffect(totalStepCount, walkState) {
-        if (walkState == WalkingState.Idle && totalStepCount > 0L) {
-            if (initialSessionSteps == 0L) {
-                initialSessionSteps = totalStepCount
-            }
-            hasInitialOffsetBeenSet = true
+    LaunchedEffect(Unit) {
+        if (walkState == WalkingState.Idle) {
+            pedometer.start()
         }
     }
 
@@ -164,7 +153,7 @@ fun MapsWithPedometerScreen(
             ) {
                 when (walkState) {
                     WalkingState.Idle -> {
-                        if (hasInitialOffsetBeenSet) {
+                        if (totalStepCount > 0L) {
                             PixelText(
                                 text = "Total Steps: $totalStepCount",
                                 fontSize = 30.sp
@@ -201,6 +190,7 @@ fun MapsWithPedometerScreen(
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
                                 },
+                                enabled = totalStepCount > 0L,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,
                                     contentColor = Color.Black
@@ -239,7 +229,6 @@ fun MapsWithPedometerScreen(
                                     userVm.recordWalk(sessionSteps.toInt(), elapsedTime, earnedItemsList)
 
                                     earnedItemsList = emptyList()
-                                    initialSessionSteps = 0L
 
                                     navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime")
                                     walkState = WalkingState.Idle

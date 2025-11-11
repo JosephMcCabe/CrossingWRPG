@@ -125,7 +125,7 @@ fun HealthStatsScreen(
             Spacer(Modifier.height(32.dp))
             if (steps >= 10 && earnedItems.isNotEmpty()) {
                 PixelText(
-                    "Items earned: $totalItemCount",
+                    "Items found: $totalItemCount",
                     fontSize = 35.sp
                 )
                 Spacer(Modifier.height(8.dp))
@@ -159,16 +159,16 @@ fun HealthStatsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     PixelText(
-                        "ITEMS RECEIVED!",
+                        "ITEMS FOUND!",
                         fontSize = 30.sp
                     )
                 }
             },
             text = {
                 val message = if (totalItemCount == 1) {
-                    "You earned 1 item from your walk!"
+                    "As you were walking you picked up 1 item!"
                 } else {
-                    "You earned $totalItemCount items from your walk!"
+                    "As you were walking you came across $totalItemCount items!"
                 }
                 Box(
                     modifier = Modifier.fillMaxWidth(),
