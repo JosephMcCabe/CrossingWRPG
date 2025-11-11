@@ -6,7 +6,7 @@ import androidx.room.Index
 
 @Entity(
     tableName = "inventory",
-    primaryKeys = ["userId", "slot"],
+    primaryKeys = ["userId", "itemId"],
     foreignKeys = [
         ForeignKey(
             entity = User::class,

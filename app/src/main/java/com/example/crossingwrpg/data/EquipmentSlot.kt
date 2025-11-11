@@ -6,7 +6,9 @@ enum class EquipmentSlot(val db: String) {
     CHEST("chest"),
     ARMS("arms"),
     LEGS("legs"),
-    BOOTS("boots")
+    BOOTS("boots"),
+    WEAPON("weapon"),
+    CONSUMABLE("consumable")
 }
 
 class EquipmentSlotConverters {
