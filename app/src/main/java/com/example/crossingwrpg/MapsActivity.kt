@@ -1,9 +1,5 @@
 package com.example.crossingwrpg
 
-
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +14,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,100 +30,107 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
-import kotlinx.coroutines.delay
+import kotlin.collections.associateBy
+import kotlin.collections.sumOf
 
-class MapsActivity : ComponentActivity() {
-
-    private val battleSimulation = BattleSimulation()
-    private val pedometer = Pedometer(
-        context = applicationContext,
-        battleSimulation = battleSimulation
-    )
-    private val stopwatch = Stopwatch()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        pedometer.start()
-        setContent {
-            MaterialTheme {
-                val navController = rememberNavController()
-                MapsWithPedometerScreen(
-                    pedometer = pedometer,
-                    stopwatch = stopwatch,
-                    navController = navController
-                )
-            }
-        }
-    }
-}
-
+const val ITEM_REWARD_THRESHOLD = 10
 enum class WalkingState { Idle, Walking, Paused }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapsWithPedometerScreen(
     pedometer: Pedometer,
     stopwatch: Stopwatch,
-    navController: NavHostController
+    navController: NavHostController,
+    walkingStateManager: WalkingStateManager
 ) {
     val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
     val context = LocalContext.current
-    val totalStepCount by pedometer.stepCount.collectAsState()
+    val totalStepCount by pedometer.stepCount.collectAsState(initial = 0L)
     val elapsedTime by stopwatch.elapsedTime.collectAsState()
 
     var walkState by remember {
-        mutableStateOf(WalkingState.Idle)
+        mutableStateOf(walkingStateManager.walkState)
     }
 
     var initialSessionSteps by remember {
-        mutableStateOf(0L)
+        mutableStateOf(walkingStateManager.initialSessionSteps)
+    }
+    var isPedometerActive by remember {
+        mutableStateOf(walkingStateManager.isPedometerActive)
     }
 
-    var totalStepsAtIdle by remember {
-        mutableStateOf(0L)
+    var earnedItemsList by remember {
+        mutableStateOf(emptyList<EarnedItem>())
     }
+    var hasInitialOffsetBeenSet by remember { mutableStateOf(false) }
 
     val sessionSteps = (totalStepCount - initialSessionSteps).coerceAtLeast(0L)
 
 
     val notifications = remember { Notifications(context).also { it.initChannel() } }
-    var isPedometerActive by remember { mutableStateOf(false) }
-    // Reset everything each time the Walk screen is shown
-    LaunchedEffect(Unit) {
-        stopwatch.stop()
-        stopwatch.reset()
 
-        pedometer.stop()
-
-        walkState = WalkingState.Idle
-        isPedometerActive = false
+    LaunchedEffect(walkState, initialSessionSteps, isPedometerActive) {
+        walkingStateManager.walkState = walkState
+        walkingStateManager.initialSessionSteps = initialSessionSteps
+        walkingStateManager.isPedometerActive = isPedometerActive
     }
 
     LaunchedEffect(totalStepCount) {
-        if (walkState == WalkingState.Idle) {
-            totalStepsAtIdle = totalStepCount
+        if (totalStepCount > 0L) {
+            initialSessionSteps = walkingStateManager.initialSessionSteps
         }
     }
 
+    LaunchedEffect(totalStepCount, walkState) {
+        if (walkState == WalkingState.Idle && totalStepCount > 0L) {
+            if (initialSessionSteps == 0L) {
+                initialSessionSteps = totalStepCount
+            }
+            hasInitialOffsetBeenSet = true
+        }
+    }
+
+    LaunchedEffect(sessionSteps) {
+        if (walkState == WalkingState.Walking) {
+            if (sessionSteps < 10) {
+                return@LaunchedEffect
+            }
+
+            var currentEarnedMap = earnedItemsList.associateBy { it.id }.toMutableMap()
+            var rewardsGranted = false
+
+            ALL_DROPPABLE_ITEMS.forEach { itemTemplate ->
+                val threshold = itemTemplate.dropThreshold
+                val maxDropsPossible = (sessionSteps / threshold).toInt()
+                val existingItem = currentEarnedMap[itemTemplate.id]
+                val currentDropsRecorded = existingItem?.count ?: 0
+
+                if (maxDropsPossible > currentDropsRecorded) {
+                    val newDrops = maxDropsPossible - currentDropsRecorded
+
+                    if ( existingItem != null) {
+                        val updatedCount = existingItem.count + newDrops
+                        currentEarnedMap[itemTemplate.id] = existingItem.copy(count = updatedCount)
+                    } else {
+                        currentEarnedMap[itemTemplate.id] = itemTemplate.copy(count = newDrops)
+                    }
+                    rewardsGranted = true
+                }
+            }
+            if (rewardsGranted) {
+                earnedItemsList = currentEarnedMap.values.toList()
+            }
+        }
+    }
+    val totalItemsCount = earnedItemsList.sumOf { it.count }
     LaunchedEffect(isPedometerActive, sessionSteps) {
         if (!isPedometerActive) return@LaunchedEffect
     }
 
-    val currentSessionSteps = rememberUpdatedState(sessionSteps)
-
-    LaunchedEffect(isPedometerActive) {
-        if (!isPedometerActive) return@LaunchedEffect
-        while (isPedometerActive) {
-            delay(10000)
-            val stepsForNotification = currentSessionSteps.value
-            if (stepsForNotification > 0) {
-                notifications.postLevelUp("Walking leveled you up! Steps: $stepsForNotification")
-            }
-        }
-    }
+    val currentTotalStepCount = rememberUpdatedState(totalStepCount)
 
     val channelIslands = LatLng(34.161767, -119.043377)
     val cameraPositionState = rememberCameraPositionState {
@@ -162,10 +164,12 @@ fun MapsWithPedometerScreen(
             ) {
                 when (walkState) {
                     WalkingState.Idle -> {
-                        PixelText(
-                            text = "Total Steps: $totalStepCount",
-                            fontSize = 30.sp
-                        )
+                        if (hasInitialOffsetBeenSet) {
+                            PixelText(
+                                text = "Total Steps: $totalStepCount",
+                                fontSize = 30.sp
+                            )
+                        }
                     }
                     WalkingState.Walking, WalkingState.Paused -> {
                         PixelText(
@@ -184,13 +188,14 @@ fun MapsWithPedometerScreen(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // initial button state showing a start button
                     when(walkState){
                         WalkingState.Idle -> {
                             Button(
                                 onClick = {
+                                    stopwatch.reset()
+                                    earnedItemsList = emptyList()
                                     // Sets Steps to 0 every start of a new walk session
-                                    initialSessionSteps = totalStepCount
+                                    initialSessionSteps = currentTotalStepCount.value
                                     pedometer.start()
                                     stopwatch.start()
                                     walkState = WalkingState.Walking
@@ -231,7 +236,10 @@ fun MapsWithPedometerScreen(
                                     stopwatch.stop()
                                     isPedometerActive = false
 
-                                    userVm.recordWalk(sessionSteps.toInt(), elapsedTime)
+                                    userVm.recordWalk(sessionSteps.toInt(), elapsedTime, earnedItemsList)
+
+                                    earnedItemsList = emptyList()
+                                    initialSessionSteps = 0L
 
                                     navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime")
                                     walkState = WalkingState.Idle
@@ -270,6 +278,11 @@ fun MapsWithPedometerScreen(
                                     pedometer.stop()
                                     stopwatch.stop()
                                     isPedometerActive = false
+
+                                    userVm.recordWalk(sessionSteps.toInt(), elapsedTime, earnedItemsList)
+                                    earnedItemsList = emptyList()
+                                    initialSessionSteps = 0L
+                                    navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime")
 
                                     walkState = WalkingState.Idle
                                 },

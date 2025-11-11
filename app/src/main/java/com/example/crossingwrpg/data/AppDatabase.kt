@@ -4,8 +4,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.Room
 import android.content.Context
+import androidx.room.TypeConverters
+import com.example.crossingwrpg.com.example.crossingwrpg.data.ItemListConverter
 
-@Database(entities = [User::class], version = 1, exportSchema = true)
+@Database(entities = [User::class], version = 1, exportSchema = false)
+@TypeConverters(ItemListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
 
