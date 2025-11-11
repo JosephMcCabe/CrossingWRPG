@@ -35,30 +35,9 @@ class UserViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun recordWalk(steps: Int, seconds:Int, earnedItems: List<EarnedItem>) = viewModelScope.launch {
-
-        val redPotionCount = earnedItems.filter { it.id == "red_potion"}.sumOf { it.count }
-        val purplePotionCount = earnedItems.filter { it.id == "purple_potion"}.sumOf { it.count }
-
-        repo.addWalk(steps)
-        repo.addSecs(seconds)
-
-        if ((redPotionCount > 0) && (redPotionCount < 50)) {
-            repo.addRedPotion(redPotionCount)
-        }
-
-        if ((purplePotionCount > 0) && (purplePotionCount < 50)) {
-            repo.addPurplePotion(purplePotionCount)
-        }
-
-        val totalCount = earnedItems.sumOf { it.count }
-        if (totalCount > 0) {
-            repo.addItems(totalCount)
-        }
-
-        if (earnedItems.isNotEmpty()) {
-            repo.updateSessionItems(earnedItems)
-        }
+        repo.addWalk(steps, seconds, earnedItems)
     }
+
     fun useRedPotion() = viewModelScope.launch {
         repo.consumeRedPotion()
     }

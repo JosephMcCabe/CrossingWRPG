@@ -1,6 +1,7 @@
 package com.example.crossingwrpg.data
 
 import com.example.crossingwrpg.EarnedItem
+
 class UserRepository(private val dao: UserDao) {
 
     val userFlow = dao.observeById(1)
@@ -20,32 +21,37 @@ class UserRepository(private val dao: UserDao) {
         if (current == null) {
             dao.insert(User(uid = 1, name = name))
         } else {
-            dao.updateName(name)
+            dao.updateUser(current.copy(name = name))
         }
     }
 
-    suspend fun addWalk(steps: Int) {
-        dao.addToTotalSteps(steps)
-    }
+    suspend fun addWalk(steps: Int, seconds: Int, earnedItems: List<EarnedItem>) {
+        val user = getCurrentUser() ?: return
 
-    suspend fun addSecs(seconds: Int) {
-        dao.addToTotalTime(seconds)
-    }
+        val redPotionCount = earnedItems.filter { it.id == "red_potion"}.sumOf { it.count }
+        val purplePotionCount = earnedItems.filter { it.id == "purple_potion"}.sumOf { it.count }
+        val totalItemsCount = earnedItems.sumOf { it.count }
 
-    suspend fun addItems(itemsCount: Int) {
-        dao.addToTotalItems(itemsCount)
-    }
+        val updatedUser = user.copy(
+            totalSteps = user.totalSteps + steps,
+            totalWalkingSeconds = user.totalWalkingSeconds + seconds,
+            totalItems = user.totalItems + totalItemsCount,
+            sessionItems = earnedItems
+        )
 
-    suspend fun updateSessionItems(items: List<EarnedItem>) {
-        dao.updateSessionItems(items)
-    }
-
-    suspend fun addRedPotion(count: Int) {
-        dao.addRedPotions(count)
-    }
-
-    suspend fun addPurplePotion(count: Int) {
-        dao.addPurplePotions(count)
+        val finalUser = updatedUser.copy(
+            redPotions = if (redPotionCount > 0) {
+                updatedUser.redPotions + redPotionCount
+            } else {
+                updatedUser.redPotions
+            },
+            purplePotions = if (purplePotionCount > 0) {
+                updatedUser.purplePotions + purplePotionCount
+            } else {
+                updatedUser.purplePotions
+            }
+        )
+        dao.updateUser(finalUser)
     }
 
     suspend fun consumeRedPotion() {

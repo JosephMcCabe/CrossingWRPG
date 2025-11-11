@@ -17,6 +17,5 @@ data class User (
     val sessionItems: List<EarnedItem>? = emptyList(),
     val redPotions: Int = 0,
     val purplePotions: Int = 0,
-    val sword: Int = 0,
-    val lastResetDate: String = "2000-01-01"
+    val sword: Int = 0
 )
