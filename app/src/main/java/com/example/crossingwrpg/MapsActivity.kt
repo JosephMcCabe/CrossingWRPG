@@ -199,8 +199,9 @@ fun MapsWithPedometerScreen(
                                     stopwatch.start()
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
-                                    val intent = Intent(context, HealthServices::class.java).apply {  }
-                                    ServiceCompat.startForeground(this, 100, foregroundServicesNotification, ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH)
+                                    foregroundStartService("Start")
+                                   // val intent = Intent(context, HealthServices::class.java).apply {  }
+                                    //ServiceCompat.startForeground(this, 100, foregroundServicesNotification, ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH)
 
                                 },
                                 colors = ButtonDefaults.buttonColors(
