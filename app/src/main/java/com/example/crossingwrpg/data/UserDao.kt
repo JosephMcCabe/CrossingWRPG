@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -11,18 +12,21 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE uid = :id")
     fun observeById(id: Int): Flow<User?>
 
+    @Query("SELECT * FROM user WHERE uid = 1")
+    suspend fun getCurrentUser(): User?
+
     @Query("SELECT * FROM user Where uid = :id")
     suspend fun getById(id: Int): User?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(stats: User)
 
-    @Query("UPDATE user SET name = :name WHERE uid = 1")
-    suspend fun updateName(name: String)
+    @Update
+    suspend fun updateUser(user: User)
 
-    @Query("UPDATE user SET totalSteps = totalSteps + :addSteps WHERE uid = 1")
-    suspend fun addToTotalSteps(addSteps: Int)
+    @Query("UPDATE user SET redPotions = redPotions - 1 WHERE uid = 1 AND redPotions > 0")
+    suspend fun consumeRedPotion()
 
-    @Query("UPDATE user SET totalWalkingSeconds = totalWalkingSeconds + :addSeconds WHERE uid = 1")
-    suspend fun addToTotalTime(addSeconds: Int)
+    @Query("UPDATE user SET purplePotions = purplePotions - 1 WHERE uid = 1 AND purplePotions > 0")
+    suspend fun consumePurplePotion()
 }

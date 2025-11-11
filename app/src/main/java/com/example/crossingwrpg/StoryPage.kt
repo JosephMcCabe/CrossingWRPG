@@ -2,7 +2,6 @@ package com.example.crossingwrpg
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +30,14 @@ import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.graphics.FilterQuality
+import com.example.crossingwrpg.data.UserViewModel
+import coil.decode.ImageDecoderDecoder
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 sealed class BattleState {
     object Start : BattleState()
@@ -42,7 +49,6 @@ sealed class BattleState {
     data class End(val winner : String) : BattleState()
 }
 
-// represents stats of a character
 data class Character(
     val name : String,
     var maxHealth: Int,
@@ -91,11 +97,19 @@ fun CharacterHealthBar(character: Character, modifier: Modifier = Modifier, isPl
 }
 
 @Composable
-fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Unit) {
+fun BattleScreen(
+    battleSimulation: BattleSimulation,
+    onNavigateToHome: () -> Unit,
+    userVm: UserViewModel = viewModel()
+) {
 
     val player by battleSimulation.playerState
     val enemy by battleSimulation.enemyState
     val state by battleSimulation.battleState
+
+    val user by userVm.userFlow.collectAsState(initial = null)
+
+    val redPotionAvailable = user?.redPotions ?:0
 
     fun nextTurn() {
         battleSimulation.advanceBattle()
@@ -129,13 +143,17 @@ fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Uni
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.pixelgoblin),
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(R.drawable.pixelgoblin)
+                        .decoderFactory(ImageDecoderDecoder.Factory())
+                        .build(),
                     contentDescription = "Goblin Image",
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight(),
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Crop,
+                    filterQuality = FilterQuality.None
                 )
             }
             CharacterHealthBar(
@@ -253,8 +271,10 @@ fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Uni
 
                             Button(
                                 onClick = {
+                                    userVm.useRedPotion()
                                     battleSimulation.chooseAction(BattleState.PlayerHeal)
                                 },
+                                enabled = redPotionAvailable > 0,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,
                                     contentColor = Color.Black
@@ -270,7 +290,7 @@ fun BattleScreen(battleSimulation: BattleSimulation, onNavigateToHome: () -> Uni
                                     )
                                     Spacer(Modifier.width(8.dp))
                                     PixelText(
-                                        text = "Heal"
+                                        text = "Heal (x$redPotionAvailable)"
                                     )
                                 }
                             }

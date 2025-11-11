@@ -3,6 +3,7 @@ package com.example.crossingwrpg.data
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.crossingwrpg.EarnedItem
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -15,7 +16,7 @@ class UserViewModel(app: Application) : AndroidViewModel(app) {
         UserRepository(db.userDao())
     }
 
-    val userFlow: StateFlow<User?> = repo.observeUser().stateIn(
+    val userFlow: StateFlow<User?> = repo.userFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null
@@ -33,8 +34,15 @@ class UserViewModel(app: Application) : AndroidViewModel(app) {
         repo.createOrUpdateName(name.trim())
     }
 
-    fun recordWalk(steps: Int, seconds:Int) = viewModelScope.launch {
-        repo.addWalk(steps)
-        repo.addSecs(seconds)
+    fun recordWalk(steps: Int, seconds:Int, earnedItems: List<EarnedItem>) = viewModelScope.launch {
+        repo.addWalk(steps, seconds, earnedItems)
+    }
+
+    fun useRedPotion() = viewModelScope.launch {
+        repo.consumeRedPotion()
+    }
+
+    fun usePurplePotion() = viewModelScope.launch {
+        repo.consumePurplePotion()
     }
 }

@@ -3,11 +3,13 @@ package com.example.crossingwrpg
 import android.Manifest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,17 +27,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
 
-// A main menu screen displaying the character, game title, and navigation bar.
 @Composable
-fun HomePage(onNavigateToStory: () -> Unit) {
+fun HomePage() {
     val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
     val needsName by userVm.needsName.collectAsState()
     val user by userVm.userFlow.collectAsState()
@@ -59,7 +64,6 @@ fun HomePage(onNavigateToStory: () -> Unit) {
         NameDialog(onConfirm = { name -> userVm.saveName(name) })
     }
 
-    // Box used to stack main character image, title, and buttons
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -68,14 +72,18 @@ fun HomePage(onNavigateToStory: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Image(
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(R.drawable.pixelsoldier)
+                    .decoderFactory(ImageDecoderDecoder.Factory())
+                    .build(),
+                contentDescription = "Goblin Image",
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 60.dp),
-                painter = painterResource(R.drawable.samplecharacter),
-                contentDescription = null,
-                contentScale = ContentScale.FillHeight
-
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .offset(x = 20.dp, y = 60.dp),
+                contentScale = ContentScale.Crop,
+                filterQuality = FilterQuality.None
             )
         }
 
