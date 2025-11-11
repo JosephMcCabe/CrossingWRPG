@@ -1,4 +1,4 @@
-package com.example.crossingwrpg
+package com.example.crossingwrpg.com.example.crossingwrpg
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavHostController
+import com.example.crossingwrpg.pixelFontFamily
 
 
 @Composable

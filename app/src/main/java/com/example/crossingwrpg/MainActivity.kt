@@ -29,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.crossingwrpg.com.example.crossingwrpg.AchievementsScreenFunction
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
