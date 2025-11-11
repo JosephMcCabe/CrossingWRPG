@@ -53,7 +53,7 @@
             android:theme="@style/Theme.AppCompat.Light">
         </activity>
         <service
-            android:name=".PedometerForegroundServices"
+            android:name=".com.example.crossingwrpg.HealthServices"
             android:foregroundServiceType="health">
         </service>
     </application>

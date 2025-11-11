@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Surface(color = MaterialTheme.colorScheme.background) {
                 AppNavigation()
+                MakeForegroundService()
             }
         }
     }
@@ -175,4 +176,9 @@ fun PixelText(
         textAlign = TextAlign.Center,
         fontFamily = pixelFontFamily
     )
+}
+
+@Composable
+fun MakeForegroundService(){
+
 }

@@ -45,13 +45,13 @@ class Notifications(private val context: Context) {
             .setContentIntent(mainActivityPendingIntent)
             .build()
 
-        val permissionNotGranted =
+        val notificationPermissionNotGranted =
             Build.VERSION.SDK_INT >= 33 &&
                     ActivityCompat.checkSelfPermission(
                         context, Manifest.permission.POST_NOTIFICATIONS
                     ) != PackageManager.PERMISSION_GRANTED
 
-        if (permissionNotGranted) return
+        if (notificationPermissionNotGranted) return
 
         NotificationManagerCompat.from(context).notify(1001, levelUpNotification)
     }
