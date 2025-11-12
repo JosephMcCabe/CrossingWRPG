@@ -45,6 +45,10 @@ fun HomePage() {
     val needsName by userVm.needsName.collectAsState()
     val user by userVm.userFlow.collectAsState()
 
+    // Always pause media player upon entering home page
+    mediaPlayer?.pause()
+    inBattle = false
+
     val requestPermissions = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) {}

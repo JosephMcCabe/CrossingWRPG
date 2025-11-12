@@ -45,4 +45,8 @@ class UserViewModel(app: Application) : AndroidViewModel(app) {
     fun usePurplePotion() = viewModelScope.launch {
         repo.consumePurplePotion()
     }
+
+    fun updateDefeatedEnemies() = viewModelScope.launch {
+        repo.addDefeatEnemies()
+    }
 }

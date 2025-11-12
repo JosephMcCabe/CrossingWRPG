@@ -1,5 +1,6 @@
 package com.example.crossingwrpg
 
+import android.media.MediaPlayer
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -96,6 +97,11 @@ fun CharacterHealthBar(character: Character, modifier: Modifier = Modifier, isPl
     }
 }
 
+
+var inBattle : Boolean = false
+var battleWon : Boolean = false
+
+
 @Composable
 fun BattleScreen(
     battleSimulation: BattleSimulation,
@@ -108,6 +114,8 @@ fun BattleScreen(
     val state by battleSimulation.battleState
 
     val user by userVm.userFlow.collectAsState(initial = null)
+
+    val context = LocalContext.current
 
     val redPotionAvailable = user?.redPotions ?:0
 
@@ -179,9 +187,28 @@ fun BattleScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     when (state) {
-                        is BattleState.Start -> PixelText(
-                            text = "You have entered a battle"
-                        )
+                        is BattleState.Start -> {
+                            PixelText(
+                                text = "You have entered a battle"
+                            )
+
+
+                            if (mediaPlayer != null) {
+                                mediaPlayer?.stop()
+                                mediaPlayer?.release()
+                                mediaPlayer = null
+                                mediaPlayer = MediaPlayer.create(context, R.raw.xdeviruchidecisivebattle)
+
+                            }
+                            else {
+                                mediaPlayer = MediaPlayer.create(context, R.raw.xdeviruchidecisivebattle)
+                            }
+
+                            mediaPlayer?.start()
+                            mediaPlayer?.isLooping = true
+                            inBattle = true
+
+                        }
 
                         is BattleState.Intro -> PixelText(
                             text = "You are attacked by a ${enemy.name}!"
@@ -298,10 +325,22 @@ fun BattleScreen(
                     }
 
                     is BattleState.End -> {
+                            mediaPlayer?.stop()
+                            mediaPlayer?.release()
+                            mediaPlayer = null
+                            mediaPlayer = MediaPlayer.create(context, R.raw.victory1)
+                            mediaPlayer?.start()
+
+                        if (!battleWon)
+                            userVm.updateDefeatedEnemies()
+
+                        battleWon = true
+
                         Button(
                             onClick = {
                                 battleSimulation.resetBattle()
                                 onNavigateToHome()
+                                battleWon = false
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Black,
