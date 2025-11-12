@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 
 @Database(
     entities = [User::class, Item::class, Equipped::class, Inventory::class],
-    version = 4,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(EquipmentSlotConverters::class)
@@ -25,7 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, AppDatabase::class.java, "crossing_database")
                     .addCallback(PopulateItems.callback())
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(true)
                     .build().also { Instance = it }
             }
         }
