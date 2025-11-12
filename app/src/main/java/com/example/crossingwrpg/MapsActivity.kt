@@ -110,18 +110,22 @@ fun MapsWithPedometerScreen(
                 }
             }
             if (rewardsGranted) {
-                val oldItemsList = earnedItemsList
+                val oldItemsList = earnedItemsList.associateBy { it.id }
                 earnedItemsList = currentEarnedMap.values.toList()
 
-                val newRewards = earnedItemsList.filter { earnedItem ->
-                    val oldQuantity = oldItemsList.find { it.id == earnedItem.id }?.count ?: 0
-                    earnedItem.count > oldQuantity
-                }
+                val newItemMessages = mutableListOf<String>()
+                earnedItemsList.forEach { finalEarnedItem ->
+                    val oldQuantity = oldItemsList[finalEarnedItem.id]?.count ?:0
 
-                if (newRewards.isNotEmpty()) {
-                    val notificationMessage = newRewards.joinToString(separator = ", ") { item ->
-                        "${item.count - (oldItemsList.find { it.id == item.id }?.count ?: 0)} ${item.name}"
+                    val addedCount = finalEarnedItem.count - oldQuantity
+
+                    if (addedCount > 0) {
+                        newItemMessages.add("$addedCount ${finalEarnedItem.name}")
                     }
+                }
+                val notificationMessage = newItemMessages.joinToString(separator = ", ")
+
+                if (notificationMessage.isNotEmpty()) {
                     notifications.showItemNotification(
                         title = "As you were walking...",
                         message = "You found: $notificationMessage"
