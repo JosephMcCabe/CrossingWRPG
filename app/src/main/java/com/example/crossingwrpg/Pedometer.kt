@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 
 class Pedometer(
@@ -41,5 +42,9 @@ class Pedometer(
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 
+    }
+
+    fun debugAddSteps(steps: Int = 1) {
+        counter.update { it + steps }
     }
 }
