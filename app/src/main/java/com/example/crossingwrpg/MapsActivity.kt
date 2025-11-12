@@ -36,14 +36,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.crossingwrpg.com.example.crossingwrpg.HealthServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.delay
-import android.content.Intent
-import android.content.pm.ServiceInfo
-import androidx.core.app.ServiceCompat
+
 
 class MapsActivity : ComponentActivity() {
 
@@ -61,8 +58,6 @@ class MapsActivity : ComponentActivity() {
             MaterialTheme {
                 val navController = rememberNavController()
                 MapsWithPedometerScreen(
-                    pedometer = pedometer,
-                    stopwatch = stopwatch,
                     navController = navController
                 )
             }
@@ -74,14 +69,12 @@ enum class WalkingState { Idle, Walking, Paused }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapsWithPedometerScreen(
-    pedometer: Pedometer,
-    stopwatch: Stopwatch,
     navController: NavHostController
 ) {
     val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
     val context = LocalContext.current
-    val totalStepCount by pedometer.stepCount.collectAsState()
-    val elapsedTime by stopwatch.elapsedTime.collectAsState()
+    val totalStepCount by WalkBus.steps.collectAsState(initial = 0L)
+    val elapsedTime by WalkBus.elapsed.collectAsState(initial = 0)
 
     var walkState by remember {
         mutableStateOf(WalkingState.Idle)
@@ -102,11 +95,6 @@ fun MapsWithPedometerScreen(
     var isPedometerActive by remember { mutableStateOf(false) }
     // Reset everything each time the Walk screen is shown
     LaunchedEffect(Unit) {
-        stopwatch.stop()
-        stopwatch.reset()
-
-        pedometer.stop()
-
         walkState = WalkingState.Idle
         isPedometerActive = false
     }
@@ -116,7 +104,6 @@ fun MapsWithPedometerScreen(
             totalStepsAtIdle = totalStepCount
         }
     }
-
     LaunchedEffect(isPedometerActive, sessionSteps) {
         if (!isPedometerActive) return@LaunchedEffect
     }
@@ -195,14 +182,9 @@ fun MapsWithPedometerScreen(
                                 onClick = {
                                     // Sets Steps to 0 every start of a new walk session
                                     initialSessionSteps = totalStepCount
-                                    pedometer.start()
-                                    stopwatch.start()
+                                    context.sendHealthCommand(HealthCommand.START)
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
-                                    foregroundStartService("Start")
-                                   // val intent = Intent(context, HealthServices::class.java).apply {  }
-                                    //ServiceCompat.startForeground(this, 100, foregroundServicesNotification, ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH)
-
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,
@@ -218,8 +200,7 @@ fun MapsWithPedometerScreen(
                         WalkingState.Walking -> {
                             Button(
                                 onClick = {
-                                    pedometer.stop()
-                                    stopwatch.stop()
+                                   context.sendHealthCommand(HealthCommand.PAUSE)
                                     walkState = WalkingState.Paused
                                     isPedometerActive = false
                                 },
@@ -235,8 +216,7 @@ fun MapsWithPedometerScreen(
                             }
                             Button(
                                 onClick = {
-                                    pedometer.stop()
-                                    stopwatch.stop()
+                                    context.sendHealthCommand(HealthCommand.STOP)
                                     isPedometerActive = false
 
                                     userVm.recordWalk(sessionSteps.toInt(), elapsedTime)
@@ -258,8 +238,7 @@ fun MapsWithPedometerScreen(
                         WalkingState.Paused -> {
                             Button(
                                 onClick = {
-                                    pedometer.start()
-                                    stopwatch.start()
+                                    context.sendHealthCommand(HealthCommand.CONTINUE)
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
                                 },
@@ -275,8 +254,7 @@ fun MapsWithPedometerScreen(
                             }
                             Button(
                                 onClick = {
-                                    pedometer.stop()
-                                    stopwatch.stop()
+                                    context.sendHealthCommand(HealthCommand.STOP)
                                     isPedometerActive = false
 
                                     walkState = WalkingState.Idle
