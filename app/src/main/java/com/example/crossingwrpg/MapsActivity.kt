@@ -105,7 +105,27 @@ fun MapsWithPedometerScreen(
                 }
             }
             if (rewardsGranted) {
+                val oldItemsList = earnedItemsList.associateBy { it.id }
                 earnedItemsList = currentEarnedMap.values.toList()
+
+                val newItemMessages = mutableListOf<String>()
+                earnedItemsList.forEach { finalEarnedItem ->
+                    val oldQuantity = oldItemsList[finalEarnedItem.id]?.count ?:0
+
+                    val addedCount = finalEarnedItem.count - oldQuantity
+
+                    if (addedCount > 0) {
+                        newItemMessages.add("$addedCount ${finalEarnedItem.name}")
+                    }
+                }
+                val notificationMessage = newItemMessages.joinToString(separator = ", ")
+
+                if (notificationMessage.isNotEmpty()) {
+                    notifications.showItemNotification(
+                        title = "As you were walking...",
+                        message = "You found: $notificationMessage"
+                    )
+                }
             }
         }
     }
