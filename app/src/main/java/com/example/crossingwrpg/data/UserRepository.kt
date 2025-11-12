@@ -61,4 +61,8 @@ class UserRepository(private val dao: UserDao) {
     suspend fun consumePurplePotion() {
         dao.consumePurplePotion()
     }
+
+    suspend fun addDefeatEnemies() {
+        dao.addToEnemiesDefeated()
+    }
 }

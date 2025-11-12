@@ -15,18 +15,31 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.crossingwrpg.pixelFontFamily
 
 
+private var achievementsCompleted = 0
 @Composable
 fun AchievementsScreenFunction(navController: NavHostController) {
+
+    val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
+    val user = userVm.userFlow.collectAsState(initial = null).value
+
+    val userSteps = user?.totalSteps ?: 0
+    val totalEnemiesDefeat = user?.enemiesDefeated ?: 0
+    val userTime = user?.totalWalkingSeconds ?: 0
+
+    achievementsCompleted = 0
+
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -67,43 +80,43 @@ fun AchievementsScreenFunction(navController: NavHostController) {
                 AchievementCard(
                     achievementName = "A New Beginning",
                     achievementDescription = "Walk 1,000 steps",
-                    achievementProgress = 600.0 / 1000.0
+                    achievementProgress = userSteps / 1000.0
                 )}
             item{
                 AchievementCard(
-                    achievementName = "Goblin Slaying",
-                    achievementDescription = "Defeat 5 Evil Goblins",
-                    achievementProgress = 5.0 / 5.0
+                    achievementName = "Making Progress",
+                    achievementDescription = "Walk 10,000 Steps",
+                    achievementProgress = userSteps / 10000.0
                 )}
             item{
                 AchievementCard(
-                    achievementName = "A Step Up",
+                    achievementName = "True Walker",
                     achievementDescription = "Walk 100,000 Steps",
-                    achievementProgress = 600.0 / 100000.0
+                    achievementProgress = userSteps / 100000.0
+                )}
+            item{
+                AchievementCard(
+                    achievementName = "New Slayer",
+                    achievementDescription = "Defeat 5 Enemies",
+                    achievementProgress = totalEnemiesDefeat / 5.0
                 )}
             item{
                 AchievementCard(
                     achievementName = "Dungeon Crawler",
-                    achievementDescription = "Defeat 50 enemies",
-                    achievementProgress = 25.0 / 50.0
-                )}
-            item{
-                AchievementCard(
-                    achievementName = "Adventurer",
-                    achievementDescription = "Take 5,000 steps in one walk",
-                    achievementProgress = 600.0 / 5000.0
+                    achievementDescription = "Defeat 25 enemies",
+                    achievementProgress = totalEnemiesDefeat / 25.0
                 )}
             item{
                 AchievementCard(
                     achievementName = "Be Right Back",
-                    achievementDescription = "Walk for a total of 1 hour",
-                    achievementProgress = 5.0 / 60.0
+                    achievementDescription = "Walk for a total of 30 minutes",
+                    achievementProgress = userTime / (30.0 * 60.0)
                 )}
             item{
                 AchievementCard(
                     achievementName = "???",
-                    achievementDescription = "Progress in the story to unlock",
-                    achievementProgress = 24.0 / 100.0
+                    achievementDescription = "Unlock more achievements to unlock",
+                    achievementProgress = 0.0 / 1.0
                 )}
         }
     }
@@ -116,11 +129,18 @@ fun AchievementCard(
     achievementDescription: String,
     achievementProgress: Double,
 ) {
-    //Set Achievement progress bar to accurately show progress
+    // Set Achievement progress bar to accurately show progress to
     var achievementPercentCompleted = achievementProgress
-    achievementPercentCompleted = (achievementPercentCompleted * 100)
-    achievementPercentCompleted = (achievementPercentCompleted * 2.75)
+    achievementPercentCompleted = (achievementPercentCompleted * 100) * 2.75
 
+    var localName = achievementName
+    var localDescription = achievementDescription
+
+    if (achievementDescription == "Unlock more achievements to unlock" && achievementsCompleted >= 6) {
+        localName = "Walking Hero"
+        localDescription = "Unlock all achievements in Crossing: A Walking RPG"
+        achievementPercentCompleted= 275.0
+    }
 
     ElevatedCard(
         modifier = Modifier
@@ -131,15 +151,15 @@ fun AchievementCard(
             imageVector = Icons.Default.EmojiEvents,
             contentDescription = "Trophy Image",
         )
+            Text(
+                text = " $localName ",
+                fontFamily = pixelFontFamily,
+                fontSize = 35.sp,
+                color = Color.DarkGray,
+                modifier = Modifier
+            )
         Text(
-            text = " $achievementName ",
-            fontFamily = pixelFontFamily,
-            fontSize = 35.sp,
-            color = Color.DarkGray,
-            modifier = Modifier
-        )
-        Text(
-            text = " $achievementDescription ",
+            text = " $localDescription ",
             fontFamily = pixelFontFamily,
             fontSize = 25.sp,
             color = Color.DarkGray,
@@ -156,6 +176,7 @@ fun AchievementCard(
             )
         }
         else {
+            achievementsCompleted++
             Text(
                 text = " Completed! ",
                 fontFamily = pixelFontFamily,

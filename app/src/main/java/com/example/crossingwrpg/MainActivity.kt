@@ -1,5 +1,6 @@
 package com.example.crossingwrpg
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -33,12 +35,39 @@ import com.example.crossingwrpg.com.example.crossingwrpg.AchievementsScreenFunct
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+// Create media player variable to be used across all screens
+var mediaPlayer: MediaPlayer? = null
+
 class MainActivity : ComponentActivity() {
     private val battleSimulation = BattleSimulation()
     private lateinit var pedometer: Pedometer
     private val stopwatch = Stopwatch()
     private val walkingStateManager = WalkingStateManager()
     private lateinit var notifications: Notifications
+
+
+    override fun onPause() {
+        super.onPause()
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (inBattle) {
+            if (!battleWon) {
+                mediaPlayer = MediaPlayer.create(this, R.raw.xdeviruchidecisivebattle)
+                mediaPlayer?.start()
+                mediaPlayer?.isLooping = true
+            } else {
+                mediaPlayer = MediaPlayer.create(this, R.raw.victory1)
+                mediaPlayer?.start()
+                mediaPlayer?.isLooping = true
+            }
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +125,23 @@ fun AppNavigation(
     val currentRoute = navBackStackEntry?.destination?.route
     val baseRoute = currentRoute?.substringBefore("?")
 
+    val context = LocalContext.current
+
+    if (currentRoute != "story_page") {
+        mediaPlayer?.pause()
+        inBattle = false
+    }
+
+    if (currentRoute == "story_page") {
+        if (inBattle && !battleWon) {
+                mediaPlayer = MediaPlayer.create(context, R.raw.xdeviruchidecisivebattle)
+                mediaPlayer?.start()
+                mediaPlayer?.isLooping = true
+            }
+
+        mediaPlayer?.start()
+        inBattle = true
+    }
 
     // Scaffold provides overall screen structure
     Scaffold(
