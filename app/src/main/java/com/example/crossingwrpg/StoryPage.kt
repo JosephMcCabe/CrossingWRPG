@@ -122,6 +122,7 @@ fun BattleScreen(
         }
     }
 
+    val context = LocalContext.current
     val redPotionAvailable = user?.redPotions ?:0
 
     fun nextTurn() {
