@@ -161,7 +161,8 @@ class HealthServices: Service() {
             )
         if (activityPermission != PermissionChecker.PERMISSION_GRANTED) {
             stopSelf()
-            //actuallly launch the foreground
+            //actually
+            y launch the foreground
             return
         }
 
