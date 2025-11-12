@@ -138,6 +138,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             composable(route = Destination.WALK_MAP.route) {
                 MapsWithPedometerScreen(
                     navController = navController,
+                    pedometer = pedometer,
+                    stopwatch = stopwatch
                 )
             }
             composable(

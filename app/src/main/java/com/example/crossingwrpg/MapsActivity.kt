@@ -36,14 +36,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.crossingwrpg.com.example.crossingwrpg.HealthServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.delay
-import android.content.Intent
-import android.content.pm.ServiceInfo
-import androidx.core.app.ServiceCompat
 
 class MapsActivity : ComponentActivity() {
 
@@ -199,9 +195,7 @@ fun MapsWithPedometerScreen(
                                     stopwatch.start()
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
-                                    foregroundStartService("Start")
-                                   // val intent = Intent(context, HealthServices::class.java).apply {  }
-                                    //ServiceCompat.startForeground(this, 100, foregroundServicesNotification, ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH)
+                                    context.foregroundStartService("Start")
 
                                 },
                                 colors = ButtonDefaults.buttonColors(
@@ -222,6 +216,7 @@ fun MapsWithPedometerScreen(
                                     stopwatch.stop()
                                     walkState = WalkingState.Paused
                                     isPedometerActive = false
+                                    context.foregroundStartService("Exit")
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Black,
@@ -243,6 +238,7 @@ fun MapsWithPedometerScreen(
 
                                     navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime")
                                     walkState = WalkingState.Idle
+                                    context.foregroundStartService("Exit")
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Red,

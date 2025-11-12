@@ -6,17 +6,12 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
-import android.content.pm.ServiceInfo
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.core.app.ServiceCompat
-import androidx.core.content.PermissionChecker
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
-import com.example.crossingwrpg.R.drawable.pixelpotion
-
 
 /*
 To ensure that your app is secure,
