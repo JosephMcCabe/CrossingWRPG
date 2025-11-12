@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -108,6 +109,12 @@ fun BattleScreen(
     val state by battleSimulation.battleState
 
     val user by userVm.userFlow.collectAsState(initial = null)
+
+    LaunchedEffect(user?.uid, state) {
+        if (user != null && (state is BattleState.Start || state is BattleState.Intro)) {
+            battleSimulation.applyUser(user!!)
+        }
+    }
 
     val redPotionAvailable = user?.redPotions ?:0
 
@@ -192,7 +199,7 @@ fun BattleScreen(
                         )
 
                         is BattleState.PlayerAttack -> PixelText(
-                            text = "You attacked ${enemy.name} for ${battleSimulation.playerStrength} damage!",
+                            text = "You attacked ${enemy.name} for ${player.strength} damage!",
                         )
 
                         is BattleState.PlayerHeal -> PixelText(
@@ -200,7 +207,7 @@ fun BattleScreen(
                         )
 
                         is BattleState.EnemyTurn -> PixelText(
-                            text = "You are attacked by the ${enemy.name} for ${battleSimulation.enemyStrength} damage!",
+                            text = "You are attacked by the ${enemy.name} for ${enemy.strength} damage!",
                         )
 
                         is BattleState.End -> {

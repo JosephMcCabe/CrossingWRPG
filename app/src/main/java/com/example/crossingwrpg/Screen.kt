@@ -2,9 +2,11 @@ package com.example.crossingwrpg
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 // Defines all navigation screens in the app.
 enum class Destination(
@@ -16,6 +18,11 @@ enum class Destination(
         route = "story_page",
         icon = Icons.Default.AutoStories,
         contentDescription = "Battle Screen"
+    ),
+    CHARACTER(
+        route = "character_page",
+        icon = Icons.Default.Person,
+        contentDescription = "Character Screen"
     ),
     HOME(
         route = "home_page",

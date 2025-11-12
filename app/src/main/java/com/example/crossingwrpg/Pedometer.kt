@@ -35,7 +35,6 @@ class Pedometer(
             if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
                 val totalSteps = event.values[0].toLong()
                 counter.value = totalSteps
-                battleSimulation.updateSteps(totalSteps)
             }
         }
     }

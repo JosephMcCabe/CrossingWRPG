@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 
 @Database(
     entities = [User::class, Item::class, Equipped::class, Inventory::class],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(EquipmentSlotConverters::class)

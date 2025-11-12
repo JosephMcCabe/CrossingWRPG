@@ -76,11 +76,6 @@ fun MapsWithPedometerScreen(
         walkingStateManager.isPedometerActive = isPedometerActive
     }
 
-    LaunchedEffect(Unit) {
-        if (walkState == WalkingState.Idle) {
-            pedometer.start()
-        }
-    }
 
     LaunchedEffect(sessionSteps) {
         if (walkState == WalkingState.Walking) {
@@ -153,12 +148,6 @@ fun MapsWithPedometerScreen(
             ) {
                 when (walkState) {
                     WalkingState.Idle -> {
-                        if (totalStepCount > 0L) {
-                            PixelText(
-                                text = "Total Steps: $totalStepCount",
-                                fontSize = 30.sp
-                            )
-                        }
                     }
                     WalkingState.Walking, WalkingState.Paused -> {
                         PixelText(
@@ -190,7 +179,6 @@ fun MapsWithPedometerScreen(
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
                                 },
-                                enabled = totalStepCount > 0L,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,
                                     contentColor = Color.Black
@@ -227,7 +215,6 @@ fun MapsWithPedometerScreen(
                                     isPedometerActive = false
 
                                     userVm.recordWalk(sessionSteps.toInt(), elapsedTime, earnedItemsList)
-
                                     earnedItemsList = emptyList()
 
                                     navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime")
