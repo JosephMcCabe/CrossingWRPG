@@ -161,7 +161,7 @@ fun BattleScreen(
                         .fillMaxWidth()
                         .fillMaxHeight(),
                     contentScale = ContentScale.Crop,
-                    filterQuality = FilterQuality.None
+                    filterQuality = FilterQuality.High
                 )
             }
             CharacterHealthBar(
