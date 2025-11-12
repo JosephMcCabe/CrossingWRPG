@@ -42,8 +42,8 @@ class BattleSimulation {
     fun createEnemyCharacter(): Character {
         return Character(
             name = "Evil Goblin Thing",
-            maxHealth = 150,
-            currentHealth = 150,
+            maxHealth = 75,
+            currentHealth = 75,
             strength = 15,
             speed = 2,
             mind = 0

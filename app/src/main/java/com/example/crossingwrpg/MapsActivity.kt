@@ -20,7 +20,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +47,12 @@ fun MapsWithPedometerScreen(
 ) {
     val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
     val context = LocalContext.current
-    val totalStepCount by pedometer.stepCount.collectAsState(initial = 0L)
+    val osTotalStepCount by pedometer.stepCount.collectAsState(initial = 0L)
+
+    var appTotalSteps: Long by remember {
+        mutableStateOf(walkingStateManager.appTotalSteps)
+    }
+
     val elapsedTime by stopwatch.elapsedTime.collectAsState()
 
     var walkState by remember {
@@ -66,16 +70,22 @@ fun MapsWithPedometerScreen(
         mutableStateOf(emptyList<EarnedItem>())
     }
 
-    val sessionSteps = (totalStepCount - initialSessionSteps).coerceAtLeast(0L)
+    val sessionSteps = (osTotalStepCount - initialSessionSteps).coerceAtLeast(0L)
 
     val notifications = remember { Notifications(context).also { it.initChannel() } }
 
-    LaunchedEffect(walkState, initialSessionSteps, isPedometerActive) {
+    LaunchedEffect(walkState, initialSessionSteps, isPedometerActive, appTotalSteps) {
         walkingStateManager.walkState = walkState
         walkingStateManager.initialSessionSteps = initialSessionSteps
         walkingStateManager.isPedometerActive = isPedometerActive
+        walkingStateManager.appTotalSteps = appTotalSteps
     }
 
+    LaunchedEffect(Unit) {
+        if (walkState == WalkingState.Idle) {
+            pedometer.start()
+        }
+    }
 
     LaunchedEffect(sessionSteps) {
         if (walkState == WalkingState.Walking) {
@@ -134,8 +144,6 @@ fun MapsWithPedometerScreen(
         if (!isPedometerActive) return@LaunchedEffect
     }
 
-    val currentTotalStepCount = rememberUpdatedState(totalStepCount)
-
     val channelIslands = LatLng(34.161767, -119.043377)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(channelIslands, 13f)
@@ -168,6 +176,12 @@ fun MapsWithPedometerScreen(
             ) {
                 when (walkState) {
                     WalkingState.Idle -> {
+                        if (osTotalStepCount >= 0L) {
+                            PixelText(
+                                text = "Total Steps: $appTotalSteps",
+                                fontSize = 30.sp
+                            )
+                        }
                     }
                     WalkingState.Walking, WalkingState.Paused -> {
                         PixelText(
@@ -193,9 +207,10 @@ fun MapsWithPedometerScreen(
                                     stopwatch.reset()
                                     earnedItemsList = emptyList()
                                     // Sets Steps to 0 every start of a new walk session
-                                    initialSessionSteps = currentTotalStepCount.value
+                                    initialSessionSteps = osTotalStepCount
                                     pedometer.start()
                                     stopwatch.start()
+                                    pedometer.debugAddSteps(20)
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
                                 },
@@ -235,6 +250,8 @@ fun MapsWithPedometerScreen(
                                     isPedometerActive = false
 
                                     userVm.recordWalk(sessionSteps.toInt(), elapsedTime, earnedItemsList)
+
+                                    appTotalSteps += sessionSteps
                                     earnedItemsList = emptyList()
 
                                     navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime")
@@ -276,6 +293,9 @@ fun MapsWithPedometerScreen(
                                     isPedometerActive = false
 
                                     userVm.recordWalk(sessionSteps.toInt(), elapsedTime, earnedItemsList)
+
+                                    appTotalSteps += sessionSteps
+
                                     earnedItemsList = emptyList()
                                     initialSessionSteps = 0L
                                     navController.navigate("health_stats?steps=$sessionSteps&time=$elapsedTime")
