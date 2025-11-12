@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.crossingwrpg.com.example.crossingwrpg.HealthServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -44,6 +43,7 @@ import kotlinx.coroutines.delay
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat.startForegroundService
 
 class MapsActivity : ComponentActivity() {
 
@@ -199,7 +199,7 @@ fun MapsWithPedometerScreen(
                                     stopwatch.start()
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
-                                    foregroundStartService("Start")
+                                    startForegroundService("Start")
                                    // val intent = Intent(context, HealthServices::class.java).apply {  }
                                     //ServiceCompat.startForeground(this, 100, foregroundServicesNotification, ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH)
 
