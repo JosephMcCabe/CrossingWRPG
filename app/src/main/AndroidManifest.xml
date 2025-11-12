@@ -53,7 +53,8 @@
             android:theme="@style/Theme.AppCompat.Light">
         </activity>
         <service
-            android:name=".com.example.crossingwrpg.HealthServices"
+            android:name=".HealthServices"
+            android:exported = "false"
             android:foregroundServiceType="health">
         </service>
     </application>

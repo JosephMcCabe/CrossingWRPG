@@ -3,26 +3,14 @@ package com.example.crossingwrpg
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.example.crossingwrpg.HealthServices
-import com.example.crossingwrpg.INTENT_COMMAND
 
-fun Context.startForegroundService(command: String){
+fun Context.sendHealthCommand(command: HealthCommand) {
     val intent = Intent(this, HealthServices::class.java)
-    if (command == "Start") {
-        intent.putExtra(INTENT_COMMAND, command)
+        .putExtra(EXTRA_COMMAND, command.name)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(intent)
-
-        }
-        else {
-            this.startService(intent)
-        }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        startForegroundService(intent)
+    } else {
+        startService(intent)
     }
-    else if (command == "Exit") {
-        intent.putExtra(INTENT_COMMAND, command)
-
-        this.stopService(intent)
-    }
-
 }

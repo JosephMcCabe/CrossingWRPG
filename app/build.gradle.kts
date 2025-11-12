@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.crossingwrpg"
-        minSdk = 34
+        minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -46,8 +46,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.text)
     val room_version = "2.8.3"
     implementation("androidx.room:room-runtime:$room_version")
-    implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
+    implementation("com.google.code.gson:gson:2.13.2")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-gif:2.6.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -78,4 +80,5 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.11.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
+
 }

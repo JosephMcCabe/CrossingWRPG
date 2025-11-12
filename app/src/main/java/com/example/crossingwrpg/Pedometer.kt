@@ -36,6 +36,7 @@ class Pedometer(
                 val totalSteps = event.values[0].toLong()
                 counter.value = totalSteps
                 battleSimulation.updateSteps(totalSteps)
+                WalkBus.publishSteps(totalSteps)
             }
         }
     }
