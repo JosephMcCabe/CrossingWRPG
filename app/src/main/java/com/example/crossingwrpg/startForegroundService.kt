@@ -1,4 +1,4 @@
-package com.example.crossingwrpg.com.example.crossingwrpg
+package com.example.crossingwrpg
 
 import android.content.Context
 import android.content.Intent

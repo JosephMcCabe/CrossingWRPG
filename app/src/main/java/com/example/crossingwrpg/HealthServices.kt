@@ -1,6 +1,5 @@
 package com.example.crossingwrpg
 
-import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -94,13 +93,13 @@ class HealthServices: Service() {
             this, CODE_CONTINUE_INTENT, continueIntent, PendingIntent.FLAG_IMMUTABLE
         )
         val pausePendingIntent = PendingIntent.getService(
-            this, CODE_PAUSE_INTENT, pauseIntent, 0
+            this, CODE_PAUSE_INTENT, pauseIntent, PendingIntent.FLAG_IMMUTABLE
         )
         val healthPendingIntent = PendingIntent.getService(
-            this, CODE_HEALTH_INTENT, healthIntent, 0
+            this, CODE_HEALTH_INTENT, healthIntent, PendingIntent.FLAG_IMMUTABLE
         )
         val stopPendingIntent = PendingIntent.getService(
-            this, CODE_STOP_INTENT, stopIntent, 0
+            this, CODE_STOP_INTENT, stopIntent, PendingIntent.FLAG_IMMUTABLE
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -133,7 +132,7 @@ class HealthServices: Service() {
             setOngoing(true)
             setWhen(System.currentTimeMillis())
             setSmallIcon(R.drawable.pathimage)
-            priority = Notification.IMPORTANCE_HIGH
+            priority = NotificationManager.IMPORTANCE_HIGH
             setContentIntent(continuePendingIntent)
             addAction(
                 0, "CONTINUE", continuePendingIntent
@@ -143,6 +142,9 @@ class HealthServices: Service() {
             )
             addAction(
                 0, "STOP", stopPendingIntent
+            )
+            addAction(
+                0, "HEALTH", healthPendingIntent
             )
 
 

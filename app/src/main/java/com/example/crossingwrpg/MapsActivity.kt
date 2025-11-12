@@ -44,6 +44,10 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat.startForegroundService
+import com.example.crossingwrpg.HealthServices
+import com.example.crossingwrpg.MakeForegroundService
+
+
 
 class MapsActivity : ComponentActivity() {
 
@@ -199,9 +203,9 @@ fun MapsWithPedometerScreen(
                                     stopwatch.start()
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
-                                    startForegroundService("Start")
-                                   // val intent = Intent(context, HealthServices::class.java).apply {  }
-                                    //ServiceCompat.startForeground(this, 100, foregroundServicesNotification, ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH)
+                                    //startForegroundService("Start")
+                                    val intent = Intent(context, HealthServices::class.java).apply {  }
+                                    ServiceCompat.startForegroundService(this, 100, foregroundServicesNotification, ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH)
 
                                 },
                                 colors = ButtonDefaults.buttonColors(
