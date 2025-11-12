@@ -29,4 +29,7 @@ interface UserDao {
 
     @Query("UPDATE user SET purplePotions = purplePotions - 1 WHERE uid = 1 AND purplePotions > 0")
     suspend fun consumePurplePotion()
+
+    @Query("UPDATE user SET enemiesDefeated = enemiesDefeated + 1 where uid = 1")
+    suspend fun addToEnemiesDefeated()
 }
