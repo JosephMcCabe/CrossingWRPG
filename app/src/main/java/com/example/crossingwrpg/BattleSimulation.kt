@@ -1,25 +1,10 @@
 package com.example.crossingwrpg
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import com.example.crossingwrpg.data.User
 
 class BattleSimulation {
-    val stepsPerSpeedPoint = 10
-    var totalSteps: Long by mutableLongStateOf(0L)
-        private set
-    var walkSpeed: Int by mutableIntStateOf(1)
-        private set
-    var stepsSinceLastSpeedIncrease: Long by mutableLongStateOf(0L)
-        private set
-
-    val baseMaxHealth: Int = 100
-    val baseStrength: Int = 25
-    val baseMind: Int = 15
-
     var playerState: MutableState<Character> = mutableStateOf(createPlayerCharacter())
         private set
     var enemyState: MutableState<Character> = mutableStateOf(createEnemyCharacter())
@@ -27,55 +12,42 @@ class BattleSimulation {
     var battleState: MutableState<BattleState> = mutableStateOf(BattleState.Start)
         private set
 
-    val playerStrength: Int get() = playerState.value.strength
-    val enemyStrength: Int get() = enemyState.value.strength
-
     private val player: Character get() = playerState.value
     private val enemy: Character get() = enemyState.value
 
     fun createPlayerCharacter(): Character {
         return Character(
-            name = "Fatima",
-            maxHealth = baseMaxHealth,
-            currentHealth = baseMaxHealth,
-            strength = baseStrength,
-            speed = walkSpeed,
-            mind = baseMind
+            name = "Walker",
+            maxHealth = 100,
+            currentHealth = 100,
+            strength = 100,
+            speed = 1,
+            mind = 1
         )
+    }
+
+    private fun userToCharacter(user: User) = Character(
+        name = user.name.ifBlank { "Walker" },
+        maxHealth = user.vitality,
+        currentHealth = user.vitality,
+        strength = user.strength,
+        speed = user.speed,
+        mind = user.mind
+    )
+
+    fun applyUser(user: User) {
+        playerState.value = userToCharacter(user)
     }
 
     fun createEnemyCharacter(): Character {
         return Character(
             name = "Evil Goblin Thing",
-            maxHealth = 150,
-            currentHealth = 150,
+            maxHealth = 75,
+            currentHealth = 75,
             strength = 15,
             speed = 2,
             mind = 0
         )
-    }
-
-    fun updateSteps(newTotalSteps: Long) {
-        if(newTotalSteps <= totalSteps) {
-            return
-        }
-
-        val stepsGained = newTotalSteps - totalSteps
-        totalSteps = newTotalSteps
-
-        val stepsTowardsNext = stepsSinceLastSpeedIncrease + stepsGained
-        val speedIncrease = (stepsTowardsNext / stepsPerSpeedPoint).toInt()
-
-        var speedChanged = false
-
-        if(speedIncrease > 0) {
-            walkSpeed += speedIncrease
-            speedChanged = true
-        }
-
-        if(speedChanged || player.speed != walkSpeed) {
-            playerState.value = player.copy(speed = walkSpeed)
-        }
     }
 
     fun advanceBattle() {

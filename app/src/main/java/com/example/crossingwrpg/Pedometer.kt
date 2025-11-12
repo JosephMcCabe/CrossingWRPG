@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 
 class Pedometer(
@@ -35,12 +36,15 @@ class Pedometer(
             if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
                 val totalSteps = event.values[0].toLong()
                 counter.value = totalSteps
-                battleSimulation.updateSteps(totalSteps)
             }
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 
+    }
+
+    fun debugAddSteps(steps: Int = 1) {
+        counter.update { it + steps }
     }
 }

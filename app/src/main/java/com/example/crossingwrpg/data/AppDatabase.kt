@@ -25,7 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, AppDatabase::class.java, "crossing_database")
                     .addCallback(PopulateItems.callback())
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(true)
                     .build().also { Instance = it }
             }
         }
