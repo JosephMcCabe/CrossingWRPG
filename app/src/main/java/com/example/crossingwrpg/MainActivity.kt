@@ -79,7 +79,6 @@ class MainActivity : ComponentActivity() {
             battleSimulation = battleSimulation
         )
         notifications = Notifications(applicationContext).apply { initChannel() }
-        pedometer.start()
 
         lifecycleScope.launch {
             while (true) {
@@ -100,20 +99,17 @@ class MainActivity : ComponentActivity() {
                     pedometer = pedometer,
                     stopwatch = stopwatch,
                     battleSimulation = battleSimulation,
-                    walkingStateManager = walkingStateManager
                 )
             }
         }
     }
 }
 
-@Preview
 @Composable
 fun AppNavigation(
     pedometer: Pedometer,
     stopwatch: Stopwatch,
     battleSimulation: BattleSimulation,
-    walkingStateManager: WalkingStateManager,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -195,8 +191,7 @@ fun AppNavigation(
                 MapsWithPedometerScreen(
                     navController = navController,
                     pedometer = pedometer,
-                    stopwatch = stopwatch,
-                    walkingStateManager = walkingStateManager
+                    stopwatch = stopwatch
                 )
             }
             composable(
