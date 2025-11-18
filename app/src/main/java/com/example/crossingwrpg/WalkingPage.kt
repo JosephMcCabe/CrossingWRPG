@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 @Composable
-fun MapsWithPedometerScreen(
+fun WalkingScreen(
     pedometer: Pedometer,
     stopwatch: Stopwatch,
     navController: NavHostController,
