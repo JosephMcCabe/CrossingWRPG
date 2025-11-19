@@ -40,8 +40,6 @@ fun manageWalkService(context: Context, action: String) {
 
 @Composable
 fun WalkingScreen(
-    pedometer: Pedometer,
-    stopwatch: Stopwatch,
     navController: NavHostController,
 ) {
     val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
@@ -50,7 +48,7 @@ fun WalkingScreen(
         Notifications(context.applicationContext).apply { initChannel() }
     }
     val walkingVm = remember {
-        WalkingViewModel.WalkingViewModel(pedometer, stopwatch, notifications)
+        WalkingViewModel.WalkingViewModel(notifications, context.applicationContext)
     }
 
     val walking = walkingVm.ui.collectAsState().value
@@ -136,8 +134,6 @@ fun WalkingScreen(
                                 onClick = {
                                     walkingVm.onStartClicked()
                                     manageWalkService(context, WalkService.ACTION_START)
-                                    pedometer.debugAddSteps(20)
-
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,

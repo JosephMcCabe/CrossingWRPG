@@ -39,9 +39,7 @@ var mediaPlayer: MediaPlayer? = null
 
 class MainActivity : ComponentActivity() {
     private val battleSimulation = BattleSimulation()
-    private lateinit var pedometer: Pedometer
-    private val stopwatch = Stopwatch()
-    private val walkingStateManager = WalkingStateManager()
+
     private lateinit var notifications: Notifications
 
 
@@ -72,30 +70,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        pedometer = Pedometer(
-            context = applicationContext,
-        )
         notifications = Notifications(applicationContext).apply { initChannel() }
-
-        lifecycleScope.launch {
-            while (true) {
-                delay(10000)
-
-                if (walkingStateManager.walkState == WalkingState.Walking) {
-                    val stepsForNotification = pedometer.stepCount.value - walkingStateManager.initialSessionSteps
-                    if (stepsForNotification >= 0) {
-                        notifications.postLevelUp("Walking leveled you up! Steps: $stepsForNotification")
-                    }
-                }
-            }
-        }
 
         setContent {
             Surface(color = MaterialTheme.colorScheme.background) {
                 AppNavigation(
-                    pedometer = pedometer,
-                    stopwatch = stopwatch,
-                    battleSimulation = battleSimulation,
+                    battleSimulation = battleSimulation
                 )
             }
         }
@@ -104,8 +84,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNavigation(
-    pedometer: Pedometer,
-    stopwatch: Stopwatch,
     battleSimulation: BattleSimulation,
     modifier: Modifier = Modifier
 ) {
@@ -187,8 +165,6 @@ fun AppNavigation(
             composable(route = Destination.WALK_MAP.route) {
                 WalkingScreen(
                     navController = navController,
-                    pedometer = pedometer,
-                    stopwatch = stopwatch
                 )
             }
             composable(

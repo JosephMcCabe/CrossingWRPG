@@ -30,9 +30,6 @@ class WalkService: Service() {
         const val ACTION_RESUME = "com.example.crossingwrpg.action.RESUME"
         const val ACTION_STOP = "com.example.crossingwrpg.action.STOP"
     }
-
-    private lateinit var pedometer: Pedometer
-    private lateinit var stopwatch: Stopwatch
     private lateinit var builder: NotificationCompat.Builder
 
     private val serviceScope = CoroutineScope(Dispatchers.Default)
@@ -44,8 +41,7 @@ class WalkService: Service() {
 
     override fun onCreate() {
         super.onCreate()
-        pedometer = Pedometer(applicationContext)
-        stopwatch = Stopwatch()
+        WalkManager.ensureInit(applicationContext)
         createNotificationChannel()
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -76,12 +72,12 @@ class WalkService: Service() {
     private fun startTicker() {
         stopTicker()
         tickerJob = serviceScope.launch {
-            pedometer.stepCount
-                .combine(stopwatch.elapsedTime) { totalSteps, elapsed ->
-                    val steps = totalSteps
-                    "Walking - Steps: $steps Time: ${elapsed}s"
-                }
-                .collect { text ->updateText(text) }
+            combine(
+                WalkManager.totalSteps,
+                WalkManager.elapsedSeconds
+            ) { steps, elapsed ->
+                "Walking - Steps: $steps Time: ${elapsed}s"
+            }.collect { text ->updateText(text) }
         }
     }
 
@@ -97,28 +93,23 @@ class WalkService: Service() {
     }
 
     private fun handleStart() {
-        pedometer.start()
-        stopwatch.reset()
-        stopwatch.start()
+        WalkManager.startSession()
         startTicker()
     }
 
     private fun handleStop() {
         stopTicker()
-        pedometer.stop()
-        stopwatch.stop()
+        WalkManager.stopSession()
         stopForeground(STOP_FOREGROUND_DETACH)
         stopSelf()
     }
 
     private fun handlePause() {
-        pedometer.stop()
-        stopwatch.stop()
+        WalkManager.pauseSession()
     }
 
     private fun handleResume() {
-        pedometer.start()
-        stopwatch.start()
+        WalkManager.resumeSession()
     }
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

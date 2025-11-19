@@ -1,5 +1,6 @@
 package com.example.crossingwrpg
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,60 +27,52 @@ class WalkingViewModel {
     )
 
     class WalkingViewModel(
-        private val pedometer: Pedometer,
-        private val stopwatch: Stopwatch,
-        private val notifications: Notifications
+        private val notifications: Notifications,
+        appContext: Context
     ) : ViewModel() {
         private val _ui = MutableStateFlow(WalkUiState())
         val ui: StateFlow<WalkUiState> = _ui.asStateFlow()
 
         init {
+            WalkManager.ensureInit(appContext)
             viewModelScope.launch {
-                stopwatch.elapsedTime.collectLatest { sec ->
+                WalkManager.totalSteps.collectLatest { step ->
+                    _ui.value = _ui.value.copy(sessionSteps = step)
+                }
+            }
+            viewModelScope.launch {
+                WalkManager.elapsedSeconds.collectLatest { sec ->
                     _ui.value = _ui.value.copy(elapsedSeconds = sec)
 
                 }
             }
         }
 
-        init {
-            viewModelScope.launch {
-                pedometer.stepCount.collectLatest { step ->
-                    _ui.value = _ui.value.copy(sessionSteps = step)
-                }
-            }
-        }
-
         fun onStartClicked() {
-            stopwatch.reset()
+            WalkManager.startSession()
             _ui.value = _ui.value.copy(
                 walkState = WalkingState.Walking,
                 sessionSteps = 0L,
                 elapsedSeconds = 0,
                 earnedItems = emptyList()
             )
-            pedometer.start()
-            stopwatch.start()
         }
 
         fun onPauseClicked() {
-            pedometer.stop()
-            stopwatch.stop()
+            WalkManager.pauseSession()
             _ui.value = _ui.value.copy(
                 walkState = WalkingState.Paused,
             )
         }
         fun onResumeClicked() {
-            pedometer.start()
-            stopwatch.start()
+            WalkManager.resumeSession()
             _ui.value = _ui.value.copy(
                 walkState = WalkingState.Walking,
             )
         }
 
         fun onStopClicked(): WalkResult{
-            pedometer.stop()
-            stopwatch.stop()
+            WalkManager.stopSession()
             val result = WalkResult(
                 steps = _ui.value.sessionSteps.toInt(),
                 time = _ui.value.elapsedSeconds,
