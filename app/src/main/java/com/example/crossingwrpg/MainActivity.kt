@@ -74,7 +74,6 @@ class MainActivity : ComponentActivity() {
 
         pedometer = Pedometer(
             context = applicationContext,
-            battleSimulation = battleSimulation
         )
         notifications = Notifications(applicationContext).apply { initChannel() }
 

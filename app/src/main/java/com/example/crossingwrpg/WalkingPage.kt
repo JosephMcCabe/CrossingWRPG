@@ -1,5 +1,7 @@
 package com.example.crossingwrpg
 
+import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,28 @@ fun WalkingScreen(
     }
 
     val walking = walkingVm.ui.collectAsState().value
+
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        // START service
+        Button(onClick = {
+            val intent = Intent(context, WalkService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+        }) {
+            PixelText("Start Service", fontSize = 20.sp)
+        }
+
+        // STOP service
+        Button(onClick = {
+            val intent = Intent(context, WalkService::class.java)
+            context.stopService(intent)
+        }) {
+            PixelText("Stop Service", fontSize = 20.sp)
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()

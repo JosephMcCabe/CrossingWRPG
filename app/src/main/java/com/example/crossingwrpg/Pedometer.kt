@@ -12,13 +12,11 @@ import kotlinx.coroutines.flow.update
 
 class Pedometer(
     context: Context,
-    private val battleSimulation: BattleSimulation
 ): SensorEventListener {
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     private val counter = MutableStateFlow(0L)
     val stepCount = counter.asStateFlow()
-    private var baseReading: Int? = null
 
 
     fun start() {
