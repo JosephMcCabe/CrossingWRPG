@@ -1,5 +1,6 @@
 package com.example.crossingwrpg
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
@@ -24,8 +25,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startForegroundService
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+
+fun manageWalkService(context: Context, action: String) {
+    val i = Intent(context.applicationContext, WalkService::class.java).setAction(action)
+    if (action == WalkService.ACTION_START) {
+        startForegroundService(context.applicationContext,i)
+    } else {
+        context.startService(i)
+    }
+}
+
 @Composable
 fun WalkingScreen(
     pedometer: Pedometer,
@@ -123,6 +135,9 @@ fun WalkingScreen(
                             Button(
                                 onClick = {
                                     walkingVm.onStartClicked()
+                                    manageWalkService(context, WalkService.ACTION_START)
+                                    pedometer.debugAddSteps(20)
+
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,
@@ -154,6 +169,7 @@ fun WalkingScreen(
                                 onClick = {
                                     val results = walkingVm.onStopClicked()
                                     userVm.recordWalk(results.steps, results.time, results.earnedItems)
+                                    manageWalkService(context, WalkService.ACTION_STOP)
                                     navController.navigate("health_stats?steps=${results.steps}&time=${results.time}")
                                 },
                                 colors = ButtonDefaults.buttonColors(
