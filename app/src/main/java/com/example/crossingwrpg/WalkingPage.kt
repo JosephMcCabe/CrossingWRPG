@@ -154,6 +154,7 @@ fun WalkingScreen(
                             Button(
                                 onClick = {
                                     walkingVm.onPauseClicked()
+                                    manageWalkService(context, WalkService.ACTION_PAUSE)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Black,
@@ -187,6 +188,7 @@ fun WalkingScreen(
                             Button(
                                 onClick = {
                                     walkingVm.onResumeClicked()
+                                    manageWalkService(context, WalkService.ACTION_RESUME)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,
@@ -201,6 +203,7 @@ fun WalkingScreen(
                             Button(
                                 onClick = {
                                     val results = walkingVm.onStopClicked()
+                                    manageWalkService(context, WalkService.ACTION_STOP)
                                     userVm.recordWalk(results.steps, results.time, results.earnedItems)
                                     navController.navigate("health_stats?steps=${results.steps}&time=${results.time}")
                                 },

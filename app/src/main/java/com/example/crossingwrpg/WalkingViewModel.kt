@@ -42,6 +42,14 @@ class WalkingViewModel {
             }
         }
 
+        init {
+            viewModelScope.launch {
+                pedometer.stepCount.collectLatest { step ->
+                    _ui.value = _ui.value.copy(sessionSteps = step)
+                }
+            }
+        }
+
         fun onStartClicked() {
             stopwatch.reset()
             _ui.value = _ui.value.copy(

@@ -66,6 +66,8 @@ class WalkService: Service() {
         when (intent?.action) {
             ACTION_START -> handleStart()
             ACTION_STOP -> handleStop()
+            ACTION_PAUSE -> handlePause()
+            ACTION_RESUME -> handleResume()
             else -> {}
         }
         return START_STICKY
@@ -107,6 +109,16 @@ class WalkService: Service() {
         stopwatch.stop()
         stopForeground(STOP_FOREGROUND_DETACH)
         stopSelf()
+    }
+
+    private fun handlePause() {
+        pedometer.stop()
+        stopwatch.stop()
+    }
+
+    private fun handleResume() {
+        pedometer.start()
+        stopwatch.start()
     }
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
