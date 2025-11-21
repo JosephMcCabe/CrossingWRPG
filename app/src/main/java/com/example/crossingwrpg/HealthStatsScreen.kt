@@ -11,6 +11,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,8 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import com.example.crossingwrpg.data.InventoryViewModel
 import com.example.crossingwrpg.data.UserViewModel
 
 @Composable
@@ -75,19 +75,26 @@ fun ItemWithCount(
 fun HealthStatsScreen(
     steps: Int = 0,
     time: Int = 0,
-    navController: NavController
+    userVm: UserViewModel,
+    inventoryVm: InventoryViewModel
 ) {
-    val userVm: UserViewModel = viewModel()
     val user = userVm.userFlow.collectAsState(initial = null).value
 
-    val earnedItems = user?.sessionItems ?: emptyList()
-    val totalItemCount = earnedItems.sumOf { it.count }
+    val earnedItems by inventoryVm.sessionEarnedItem.collectAsState()
+    val totalItemCount = earnedItems.values.sum()
 
-    var showRewardDialog by remember { mutableStateOf(false) }
+    var showRewardDialog by remember(steps, totalItemCount) { mutableStateOf(false) }
 
-    LaunchedEffect(earnedItems, steps) {
+    LaunchedEffect(steps, totalItemCount) {
         if (earnedItems.isNotEmpty() && steps >= 10) {
             showRewardDialog = true
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            if (earnedItems.isNotEmpty()) {
+                inventoryVm.commitEarnedItems()
+            }
         }
     }
 
@@ -135,13 +142,23 @@ fun HealthStatsScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 ) {
-                    earnedItems.forEach { item ->
-                        ItemWithCount(
-                            name = item.name,
-                            itemID = item.drawableId,
-                            count = item.count,
-                            modifier = Modifier.weight(1f, fill = false)
-                        )
+                    earnedItems.forEach { (itemId, count) ->
+                        val allItems by inventoryVm.allItems.collectAsState(initial = emptyList())
+                        val droppableItem = allItems.find {it.itemId == itemId}
+                        if (droppableItem != null) {
+                            val drawable = when (itemId) {
+                                1L -> R.drawable.pixelpotion
+                                2L -> R.drawable.pixelsword
+                                3L -> R.drawable.purplepotion
+                                else -> R.drawable.pixelpotion
+                            }
+                            ItemWithCount(
+                                name = droppableItem.name,
+                                itemID = drawable,
+                                count = count,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
+                        }
                     }
                 }
             }
