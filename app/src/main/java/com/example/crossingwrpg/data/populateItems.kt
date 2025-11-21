@@ -2,17 +2,21 @@ package com.example.crossingwrpg.data
 
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.crossingwrpg.R
 
 object PopulateItems {
     private fun insertItem(
         db: SupportSQLiteDatabase,
+        itemId: Long,
         name: String,
         description: String,
-        slotDb: String
+        slotDb: String,
+        drawableId: Int,
+        dropThreshold: Int
     ) {
         db.execSQL(
-            "INSERT INTO item (name, description, slot) VALUES (?, ?, ?)",
-            arrayOf(name, description, slotDb)
+            "INSERT INTO item (itemId, name, description, slot, drawableId, dropThreshold) VALUES (?, ?, ?, ?, ?, ?)",
+            arrayOf(itemId, name, description, slotDb, drawableId, dropThreshold)
         )
     }
     fun callback() = object : RoomDatabase.Callback() {
@@ -22,21 +26,30 @@ object PopulateItems {
             try {
                 insertItem(
                     db,
-                    name = "Red Potion",
+                    itemId = 1L,
+                    name = "Health Potion",
                     description = "Restores a small amount of health.",
-                    slotDb = "consumable"
+                    slotDb = "consumable",
+                    drawableId = R.drawable.pixelpotion,
+                    dropThreshold = 10
                 )
                 insertItem(
                     db,
+                    itemId = 2L,
                     name = "Iron Sword",
                     description = "A sharp iron blade.",
-                    slotDb = "weapon"
+                    slotDb = "weapon",
+                    drawableId = R.drawable.pixelsword,
+                    dropThreshold = 15
                 )
                 insertItem(
                     db,
+                    itemId = 3L,
                     name = "Purple Potion",
-                    description = "Like a red potion! but purple.",
-                    slotDb = "consumable"
+                    description = "Like a health potion! but purple.",
+                    slotDb = "consumable",
+                    drawableId = R.drawable.purplepotion,
+                    dropThreshold = 20
                 )
                 db.setTransactionSuccessful()
             } finally {

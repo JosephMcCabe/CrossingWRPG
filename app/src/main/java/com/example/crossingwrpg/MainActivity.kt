@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -15,16 +14,13 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,6 +29,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.crossingwrpg.com.example.crossingwrpg.AchievementsScreenFunction
+import com.example.crossingwrpg.data.InventoryViewModel
+import com.example.crossingwrpg.data.UserViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -117,6 +115,8 @@ fun AppNavigation(
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
+    val userVm: UserViewModel = viewModel()
+    val inventoryVm: InventoryViewModel = viewModel()
 
     // Define initial screen when opening app
     val startDestination = Destination.HOME
@@ -188,7 +188,9 @@ fun AppNavigation(
             composable(route = Destination.BATTLE.route) {
                 BattleScreen(
                     onNavigateToHome = { navController.navigate(Destination.HOME.route) },
-                    battleSimulation = battleSimulation
+                    battleSimulation = battleSimulation,
+                    userVm = userVm,
+                    inventoryVm = inventoryVm
                 )
             }
             composable(route = Destination.WALK_MAP.route) {
@@ -196,16 +198,17 @@ fun AppNavigation(
                     navController = navController,
                     pedometer = pedometer,
                     stopwatch = stopwatch,
-                    walkingStateManager = walkingStateManager
+                    walkingStateManager = walkingStateManager,
+                    userVm = userVm,
+                    inventoryVm = inventoryVm
                 )
             }
             composable(
-                route = "health_stats?steps={steps}&time={time}&totalSteps={totalSteps}",
+                route = "health_stats?steps={steps}&time={time}",
               
                 arguments = listOf(
                     navArgument("steps") { type = NavType.IntType; defaultValue = 0 },
-                    navArgument("time")  { type = NavType.IntType;  defaultValue = 0 },
-                    navArgument("totalSteps") { type = NavType.LongType; defaultValue = 0L }
+                    navArgument("time")  { type = NavType.IntType;  defaultValue = 0 }
                 )
             ) { backStackEntry ->
                 val steps = backStackEntry.arguments?.getInt("steps") ?: 0
@@ -213,7 +216,8 @@ fun AppNavigation(
                 HealthStatsScreen(
                     steps = steps,
                     time = time,
-                    navController = navController
+                    userVm = userVm,
+                    inventoryVm = inventoryVm
                 )
             }
             composable(route = Destination.ACHIEVEMENTS_SCREEN.route) {
@@ -224,18 +228,4 @@ fun AppNavigation(
             }
         }
     }
-}
-@Composable
-fun PixelText(
-    text: String,
-    modifier: Modifier = Modifier,
-    fontSize: TextUnit = 25.sp
-) {
-    Text(
-        text = text,
-        modifier = modifier,
-        fontSize = fontSize,
-        textAlign = TextAlign.Center,
-        fontFamily = pixelFontFamily
-    )
 }

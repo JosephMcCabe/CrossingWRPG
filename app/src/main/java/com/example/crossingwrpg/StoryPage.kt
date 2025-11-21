@@ -32,10 +32,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.FilterQuality
 import com.example.crossingwrpg.data.UserViewModel
+import com.example.crossingwrpg.data.InventoryViewModel
 import coil.decode.ImageDecoderDecoder
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
@@ -61,7 +61,11 @@ data class Character(
 )
 
 @Composable
-fun CharacterHealthBar(character: Character, modifier: Modifier = Modifier, isPlayer: Boolean) {
+fun CharacterHealthBar(
+    character: Character,
+    modifier: Modifier = Modifier,
+    isPlayer: Boolean
+) {
     val progress = character.currentHealth.toFloat().coerceAtLeast(0f) / character.maxHealth.toFloat()
 
     val animatedProgress by animateFloatAsState(
@@ -107,7 +111,8 @@ var battleWon : Boolean = false
 fun BattleScreen(
     battleSimulation: BattleSimulation,
     onNavigateToHome: () -> Unit,
-    userVm: UserViewModel = viewModel()
+    userVm: UserViewModel,
+    inventoryVm: InventoryViewModel
 ) {
 
     val player by battleSimulation.playerState
@@ -123,7 +128,11 @@ fun BattleScreen(
     }
 
     val context = LocalContext.current
-    val redPotionAvailable = user?.redPotions ?:0
+    val redPotionAvailable by inventoryVm.healthPotionQuantity.collectAsState()
+
+    LaunchedEffect(Unit) {
+        inventoryVm.loadHealthPotionQuantity()
+    }
 
     fun nextTurn() {
         battleSimulation.advanceBattle()
@@ -304,7 +313,7 @@ fun BattleScreen(
 
                             Button(
                                 onClick = {
-                                    userVm.useRedPotion()
+                                    inventoryVm.useHealthPotion()
                                     battleSimulation.chooseAction(BattleState.PlayerHeal)
                                 },
                                 enabled = redPotionAvailable > 0,

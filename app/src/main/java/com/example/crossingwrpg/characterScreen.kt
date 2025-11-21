@@ -96,8 +96,8 @@ fun CharacterScreen(
                 .build(),
             contentDescription = "Goblin Image",
             modifier = Modifier
-                .size(170.dp)
-                .offset(y = 120.dp),
+                .size(180.dp)
+                .offset(y = 230.dp),
             contentScale = ContentScale.Fit,
             filterQuality = FilterQuality.None
         )
