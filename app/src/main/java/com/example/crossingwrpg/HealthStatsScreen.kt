@@ -132,8 +132,8 @@ fun HealthStatsScreen(
             Spacer(Modifier.height(32.dp))
             if (steps >= 10 && earnedItems.isNotEmpty()) {
                 PixelText(
-                    "Items found: $totalItemCount",
-                    fontSize = 35.sp
+                    "Items added to inventory:",
+                    fontSize = 30.sp
                 )
                 Spacer(Modifier.height(8.dp))
                 Row(
@@ -147,16 +147,17 @@ fun HealthStatsScreen(
                         val droppableItem = allItems.find {it.itemId == itemId}
                         if (droppableItem != null) {
                             val drawable = when (itemId) {
-                                1L -> R.drawable.pixelpotion
+                                1L -> R.drawable.healthpotion
                                 2L -> R.drawable.pixelsword
-                                3L -> R.drawable.purplepotion
-                                else -> R.drawable.pixelpotion
+                                3L -> R.drawable.manapotion
+                                else -> R.drawable.healthpotion
                             }
                             ItemWithCount(
                                 name = droppableItem.name,
                                 itemID = drawable,
                                 count = count,
-                                modifier = Modifier.weight(1f, fill = false)
+                                modifier = Modifier
+                                    .weight(1f, fill = false)
                             )
                         }
                     }

@@ -93,8 +93,8 @@ fun MapsWithPedometerScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (walkingStateManager.earnedItemsList.isNotEmpty() && earnedItemsList.isEmpty()) {
-            earnedItemsList = walkingStateManager.earnedItemsList
+        if (walkState == WalkingState.Idle) {
+            pedometer.start()
         }
     }
 
@@ -104,7 +104,7 @@ fun MapsWithPedometerScreen(
                 return@LaunchedEffect
             }
 
-            var currentEarnedMap = earnedItemsList.toMutableMap()
+            val currentEarnedMap = earnedItemsList.toMutableMap()
             var rewardsGranted = false
 
             allItems.forEach { itemTemplate ->
@@ -212,7 +212,7 @@ fun MapsWithPedometerScreen(
                                     isResuming = false
                                     pedometer.start()
                                     stopwatch.start()
-                                    pedometer.debugAddSteps(20)
+                                    pedometer.debugAddSteps(100)
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
                                 },
