@@ -40,6 +40,8 @@ fun CharacterScreen(
     val userVm: UserViewModel = viewModel()
     val user = userVm.userFlow.collectAsState(initial = null).value
 
+    MusicPlayer.pause()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
