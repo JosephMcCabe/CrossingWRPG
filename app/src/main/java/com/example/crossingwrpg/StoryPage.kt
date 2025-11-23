@@ -1,6 +1,5 @@
 package com.example.crossingwrpg
 
-import android.media.MediaPlayer
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -103,9 +102,7 @@ fun CharacterHealthBar(
 }
 
 
-var inBattle : Boolean = false
 var battleWon : Boolean = false
-
 
 @Composable
 fun BattleScreen(
@@ -114,6 +111,8 @@ fun BattleScreen(
     userVm: UserViewModel,
     inventoryVm: InventoryViewModel
 ) {
+
+    MusicPlayer.play()
 
     val player by battleSimulation.playerState
     val enemy by battleSimulation.enemyState
@@ -207,21 +206,11 @@ fun BattleScreen(
                                 text = "You have entered a battle"
                             )
 
-
-                            if (mediaPlayer != null) {
-                                mediaPlayer?.stop()
-                                mediaPlayer?.release()
-                                mediaPlayer = null
-                                mediaPlayer = MediaPlayer.create(context, R.raw.xdeviruchidecisivebattle)
-
-                            }
-                            else {
-                                mediaPlayer = MediaPlayer.create(context, R.raw.xdeviruchidecisivebattle)
-                            }
-
-                            mediaPlayer?.start()
-                            mediaPlayer?.isLooping = true
-                            inBattle = true
+                            battleWon = false
+                            MusicPlayer.createPlayer(context)
+                            MusicPlayer.changeSong("xdeviruchidecisivebattle")
+                            MusicPlayer.play()
+                            MusicPlayer.loop(true)
 
                         }
 
@@ -340,11 +329,8 @@ fun BattleScreen(
                     }
 
                     is BattleState.End -> {
-                            mediaPlayer?.stop()
-                            mediaPlayer?.release()
-                            mediaPlayer = null
-                            mediaPlayer = MediaPlayer.create(context, R.raw.victory1)
-                            mediaPlayer?.start()
+                        MusicPlayer.changeSong("victory1")
+                        MusicPlayer.loop(false)
 
                         if (!battleWon)
                             userVm.updateDefeatedEnemies()
@@ -355,7 +341,7 @@ fun BattleScreen(
                             onClick = {
                                 battleSimulation.resetBattle()
                                 onNavigateToHome()
-                                battleWon = false
+                                MusicPlayer.free()
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Black,

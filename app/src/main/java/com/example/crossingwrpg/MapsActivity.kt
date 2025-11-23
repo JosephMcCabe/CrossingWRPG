@@ -144,6 +144,8 @@ fun MapsWithPedometerScreen(
         if (!isPedometerActive) return@LaunchedEffect
     }
 
+    MusicPlayer.pause()
+
     val channelIslands = LatLng(34.161767, -119.043377)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(channelIslands, 13f)
