@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.crossingwrpg.MusicPlayer
 import com.example.crossingwrpg.pixelFontFamily
 
 
@@ -40,6 +41,8 @@ fun AchievementsScreenFunction(navController: NavHostController) {
 
     achievementsCompleted = 0
 
+
+    MusicPlayer.pause()
 
     Box(modifier = Modifier
         .fillMaxSize()

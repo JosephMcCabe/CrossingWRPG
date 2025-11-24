@@ -38,16 +38,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
+import com.example.crossingwrpg.data.UserViewModel
 
 @Composable
 fun HomePage() {
-    val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
+    val userVm: UserViewModel = viewModel()
     val needsName by userVm.needsName.collectAsState()
     val user by userVm.userFlow.collectAsState()
 
-    // Always pause media player upon entering home page
-    mediaPlayer?.pause()
-    inBattle = false
+    MusicPlayer.pause()
 
     val requestPermissions = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()

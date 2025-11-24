@@ -1,7 +1,5 @@
 package com.example.crossingwrpg.data
 
-import com.example.crossingwrpg.EarnedItem
-
 class UserRepository(private val dao: UserDao) {
 
     val userFlow = dao.observeById(1)
@@ -25,42 +23,15 @@ class UserRepository(private val dao: UserDao) {
         }
     }
 
-    suspend fun addWalk(steps: Int, seconds: Int, earnedItems: List<EarnedItem>) {
+    suspend fun addWalk(steps: Int, seconds: Int) {
         val user = getCurrentUser() ?: return
-
-        val redPotionCount = earnedItems.filter { it.id == "red_potion"}.sumOf { it.count }
-        val purplePotionCount = earnedItems.filter { it.id == "purple_potion"}.sumOf { it.count }
-        val totalItemsCount = earnedItems.sumOf { it.count }
 
         val updatedUser = user.copy(
             totalSteps = user.totalSteps + steps,
             totalWalkingSeconds = user.totalWalkingSeconds + seconds,
-            speed = (user.totalSteps.toInt() + steps) / 10,
-            totalItems = user.totalItems + totalItemsCount,
-            sessionItems = earnedItems
+            speed = (user.totalSteps.toInt() + steps) / 10
         )
-
-        val finalUser = updatedUser.copy(
-            redPotions = if (redPotionCount > 0) {
-                updatedUser.redPotions + redPotionCount
-            } else {
-                updatedUser.redPotions
-            },
-            purplePotions = if (purplePotionCount > 0) {
-                updatedUser.purplePotions + purplePotionCount
-            } else {
-                updatedUser.purplePotions
-            }
-        )
-        dao.updateUser(finalUser)
-    }
-
-    suspend fun consumeRedPotion() {
-        dao.consumeRedPotion()
-    }
-
-    suspend fun consumePurplePotion() {
-        dao.consumePurplePotion()
+        dao.updateUser(updatedUser)
     }
 
     suspend fun addDefeatEnemies() {

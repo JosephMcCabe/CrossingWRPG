@@ -32,4 +32,8 @@ class InventoryRepository(private val dao: InventoryDao) {
     suspend fun getAll(): List<Inventory>{
         return dao.getAll(userId)
     }
+
+    suspend fun getAllItems(): List<Item> {
+        return dao.getAllItems()
+    }
 }
