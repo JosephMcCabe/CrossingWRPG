@@ -1,6 +1,5 @@
 package com.example.crossingwrpg
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,8 +16,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -34,8 +31,8 @@ import com.example.crossingwrpg.data.UserViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-// Create media player variable to be used across all screens
-var mediaPlayer: MediaPlayer? = null
+
+private var screenName: String? = ""
 
 class MainActivity : ComponentActivity() {
     private val battleSimulation = BattleSimulation()
@@ -44,33 +41,27 @@ class MainActivity : ComponentActivity() {
     private val walkingStateManager = WalkingStateManager()
     private lateinit var notifications: Notifications
 
-
     override fun onPause() {
         super.onPause()
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
+
+        MusicPlayer.pause()
     }
 
     override fun onResume() {
         super.onResume()
-        if (inBattle) {
-            if (!battleWon) {
-                mediaPlayer = MediaPlayer.create(this, R.raw.xdeviruchidecisivebattle)
-                mediaPlayer?.start()
-                mediaPlayer?.isLooping = true
-            } else {
-                mediaPlayer = MediaPlayer.create(this, R.raw.victory1)
-                mediaPlayer?.start()
-                mediaPlayer?.isLooping = true
-            }
-        }
+        if (screenName == "story_page")
+            MusicPlayer.play()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+            MusicPlayer.free()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        MusicPlayer.createPlayer(applicationContext)
 
         pedometer = Pedometer(
             context = applicationContext,
@@ -105,7 +96,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview
 @Composable
 fun AppNavigation(
     pedometer: Pedometer,
@@ -125,24 +115,8 @@ fun AppNavigation(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val baseRoute = currentRoute?.substringBefore("?")
+    screenName = currentRoute
 
-    val context = LocalContext.current
-
-    if (currentRoute != "story_page") {
-        mediaPlayer?.pause()
-        inBattle = false
-    }
-
-    if (currentRoute == "story_page") {
-        if (inBattle && !battleWon) {
-                mediaPlayer = MediaPlayer.create(context, R.raw.xdeviruchidecisivebattle)
-                mediaPlayer?.start()
-                mediaPlayer?.isLooping = true
-            }
-
-        mediaPlayer?.start()
-        inBattle = true
-    }
 
     // Scaffold provides overall screen structure
     Scaffold(
