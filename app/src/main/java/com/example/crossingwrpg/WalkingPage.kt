@@ -2,32 +2,48 @@ package com.example.crossingwrpg
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.crossingwrpg.data.UserViewModel
+import kotlinx.coroutines.isActive
+import kotlin.math.roundToInt
+
 
 fun manageWalkService(context: Context, action: String) {
     val i = Intent(context.applicationContext, WalkService::class.java).setAction(action)
@@ -42,7 +58,7 @@ fun manageWalkService(context: Context, action: String) {
 fun WalkingScreen(
     navController: NavHostController,
 ) {
-    val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
+    val userVm: UserViewModel = viewModel()
     val context = LocalContext.current
     val notifications = remember {
         Notifications(context.applicationContext).apply { initChannel() }
@@ -56,6 +72,10 @@ fun WalkingScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        ScrollingBackground(
+            isScrolling = walking.walkState == WalkingState.Walking
+        )
+
         Card(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -196,5 +216,50 @@ fun WalkingScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ScrollingBackground(
+    isScrolling: Boolean,
+    speedPxPerSec: Float = 60f
+) {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val density = LocalDensity.current
+        val widthPx = with(density) { maxWidth.toPx() }
+        val anim = remember { Animatable(0f) }
+
+        LaunchedEffect(isScrolling, widthPx, speedPxPerSec) {
+            if (!isScrolling || widthPx <= 0f || speedPxPerSec <= 0f) return@LaunchedEffect
+            while (isActive) {
+                val duration = ((widthPx / speedPxPerSec) * 1000f).toInt().coerceAtLeast(1)
+                anim.snapTo(0f)
+                anim.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(durationMillis = duration, easing = LinearEasing)
+                )
+            }
+        }
+
+        val offset = - (anim.value * widthPx)
+        val firstX = offset.roundToInt()
+        val secondX = (offset + widthPx).roundToInt()
+
+        Image(
+            painter = painterResource(R.drawable.background_layer_1),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .offset { IntOffset(firstX, 0) },
+            contentScale = ContentScale.Crop
+        )
+        Image(
+            painter = painterResource(R.drawable.background_layer_1),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .offset { IntOffset(secondX, 0) },
+            contentScale = ContentScale.Crop
+        )
     }
 }
