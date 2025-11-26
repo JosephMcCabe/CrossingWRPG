@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import com.example.crossingwrpg.data.EquipmentSlot
 import com.example.crossingwrpg.data.InventoryViewModel
 import com.example.crossingwrpg.data.Item
+import androidx.compose.ui.unit.TextUnit
 
 @Composable
 fun InventoryScreen(
@@ -169,7 +170,7 @@ private fun InventoryItemRow(
 @Composable
 private fun CenteredDialogTitle(
     text: String,
-    fontSize: androidx.compose.ui.unit.TextUnit = 35.sp
+    fontSize: TextUnit = 35.sp
 ) {
     Box(
         modifier = Modifier.fillMaxWidth(),

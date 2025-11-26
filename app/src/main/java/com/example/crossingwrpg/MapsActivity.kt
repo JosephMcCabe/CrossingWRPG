@@ -181,9 +181,14 @@ fun MapsWithPedometerScreen(
             speedPxPerSec = 60f
         )
 
+        val showSoldier = walkState == WalkingState.Walking
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(R.drawable.pixelsoldier)
+                .data(if (showSoldier) {
+                    R.drawable.soldierwalking
+                } else {
+                    R.drawable.pixelsoldier
+                })
                 .decoderFactory(ImageDecoderDecoder.Factory())
                 .build(),
             contentDescription = "soldier Image",
