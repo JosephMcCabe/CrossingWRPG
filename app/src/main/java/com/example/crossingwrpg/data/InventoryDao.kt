@@ -39,11 +39,20 @@ interface InventoryDao {
             " ORDER BY itemId")
     suspend fun getAll(userId: Int): List<Inventory>
 
+    @Query("SELECT *" +
+            " FROM item")
+    suspend fun getAllItems(): List<Item>
+
     @Query("SELECT item.itemId, item.name, item.description, item.slot, inventory.quantity" +
             " FROM inventory" +
             " INNER JOIN item ON item.itemId = inventory.itemId" +
             " WHERE inventory.userId = :userId AND item.itemId = :itemId")
     suspend fun getInventoryWithDetails(userId: Int, itemId: Long): InventoryRow?
+
+    @Query("SELECT *" +
+            " FROM item" +
+            " WHERE itemId = :itemId")
+    suspend fun getItemById(itemId: Long): Item?
 
     @Query("DELETE " +
             " FROM inventory" +

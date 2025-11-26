@@ -1,8 +1,8 @@
 package com.example.crossingwrpg
 
-import android.media.MediaPlayer
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,10 +32,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.FilterQuality
 import com.example.crossingwrpg.data.UserViewModel
+import com.example.crossingwrpg.data.InventoryViewModel
 import coil.decode.ImageDecoderDecoder
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
@@ -61,7 +61,11 @@ data class Character(
 )
 
 @Composable
-fun CharacterHealthBar(character: Character, modifier: Modifier = Modifier, isPlayer: Boolean) {
+fun CharacterHealthBar(
+    character: Character,
+    modifier: Modifier = Modifier,
+    isPlayer: Boolean
+) {
     val progress = character.currentHealth.toFloat().coerceAtLeast(0f) / character.maxHealth.toFloat()
 
     val animatedProgress by animateFloatAsState(
@@ -99,16 +103,17 @@ fun CharacterHealthBar(character: Character, modifier: Modifier = Modifier, isPl
 }
 
 
-var inBattle : Boolean = false
 var battleWon : Boolean = false
-
 
 @Composable
 fun BattleScreen(
     battleSimulation: BattleSimulation,
     onNavigateToHome: () -> Unit,
-    userVm: UserViewModel = viewModel()
+    userVm: UserViewModel,
+    inventoryVm: InventoryViewModel
 ) {
+
+    MusicPlayer.play()
 
     val player by battleSimulation.playerState
     val enemy by battleSimulation.enemyState
@@ -123,17 +128,47 @@ fun BattleScreen(
     }
 
     val context = LocalContext.current
-    val redPotionAvailable = user?.redPotions ?:0
+    val redPotionAvailable by inventoryVm.healthPotionQuantity.collectAsState()
+
+    LaunchedEffect(Unit) {
+        inventoryVm.loadHealthPotionQuantity()
+    }
 
     fun nextTurn() {
         battleSimulation.advanceBattle()
     }
 
+    Image(
+        painter = painterResource(R.drawable.background_layer_1),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f),
+        contentScale = ContentScale.Crop
+    )
+    Image(
+        painter = painterResource(R.drawable.background_layer_2),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f),
+        contentScale = ContentScale.Crop
+    )
+    Image(
+        painter = painterResource(R.drawable.background_layer_3),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f),
+        contentScale = ContentScale.Crop
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(32.dp)
     ) {
+
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -198,21 +233,11 @@ fun BattleScreen(
                                 text = "You have entered a battle"
                             )
 
-
-                            if (mediaPlayer != null) {
-                                mediaPlayer?.stop()
-                                mediaPlayer?.release()
-                                mediaPlayer = null
-                                mediaPlayer = MediaPlayer.create(context, R.raw.xdeviruchidecisivebattle)
-
-                            }
-                            else {
-                                mediaPlayer = MediaPlayer.create(context, R.raw.xdeviruchidecisivebattle)
-                            }
-
-                            mediaPlayer?.start()
-                            mediaPlayer?.isLooping = true
-                            inBattle = true
+                            battleWon = false
+                            MusicPlayer.preparePlayer(context)
+                            MusicPlayer.changeSong("xdeviruchidecisivebattle")
+                            MusicPlayer.play()
+                            MusicPlayer.loop()
 
                         }
 
@@ -304,7 +329,7 @@ fun BattleScreen(
 
                             Button(
                                 onClick = {
-                                    userVm.useRedPotion()
+                                    inventoryVm.useHealthPotion()
                                     battleSimulation.chooseAction(BattleState.PlayerHeal)
                                 },
                                 enabled = redPotionAvailable > 0,
@@ -317,7 +342,7 @@ fun BattleScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.pixelpotion),
+                                        painter = painterResource(id = R.drawable.healthpotion),
                                         contentDescription = "Attack Icon",
                                         modifier = Modifier.height(25.dp)
                                     )
@@ -331,22 +356,18 @@ fun BattleScreen(
                     }
 
                     is BattleState.End -> {
-                            mediaPlayer?.stop()
-                            mediaPlayer?.release()
-                            mediaPlayer = null
-                            mediaPlayer = MediaPlayer.create(context, R.raw.victory1)
-                            mediaPlayer?.start()
-
-                        if (!battleWon)
+                        if (battleWon == false) { // Runs once when on battle end
                             userVm.updateDefeatedEnemies()
-
+                            MusicPlayer.changeSong("victory1")
+                            MusicPlayer.unloop()
+                        }
                         battleWon = true
 
                         Button(
                             onClick = {
                                 battleSimulation.resetBattle()
                                 onNavigateToHome()
-                                battleWon = false
+                                MusicPlayer.free()
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Black,

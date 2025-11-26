@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.crossingwrpg.MusicPlayer
 import com.example.crossingwrpg.pixelFontFamily
 
 
@@ -40,6 +41,8 @@ fun AchievementsScreenFunction(navController: NavHostController) {
 
     achievementsCompleted = 0
 
+
+    MusicPlayer.pause()
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -142,6 +145,8 @@ fun AchievementCard(
         achievementPercentCompleted= 275.0
     }
 
+    val isCompleted = achievementPercentCompleted >= 275.0
+
     ElevatedCard(
         modifier = Modifier
             .padding(bottom = 15.dp)
@@ -150,6 +155,7 @@ fun AchievementCard(
         Icon(
             imageVector = Icons.Default.EmojiEvents,
             contentDescription = "Trophy Image",
+            tint = if (isCompleted) Color(0xFFDAA520) else Color.DarkGray
         )
             Text(
                 text = " $localName ",
@@ -162,7 +168,7 @@ fun AchievementCard(
             text = " $localDescription ",
             fontFamily = pixelFontFamily,
             fontSize = 25.sp,
-            color = Color.DarkGray,
+            color = if (isCompleted) Color.Gray else Color.DarkGray,
             modifier = Modifier
         )
         if (achievementPercentCompleted < 275.0) {
