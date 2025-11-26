@@ -101,7 +101,7 @@ fun HealthStatsScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 PixelText(
-                    "Speed: ${user?.speed}",
+                    "Attack Speed: ${user?.speed}",
                     fontSize = 35.sp
                 )
                 Spacer(Modifier.width(8.dp))

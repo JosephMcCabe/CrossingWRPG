@@ -145,6 +145,8 @@ fun AchievementCard(
         achievementPercentCompleted= 275.0
     }
 
+    val isCompleted = achievementPercentCompleted >= 275.0
+
     ElevatedCard(
         modifier = Modifier
             .padding(bottom = 15.dp)
@@ -153,6 +155,7 @@ fun AchievementCard(
         Icon(
             imageVector = Icons.Default.EmojiEvents,
             contentDescription = "Trophy Image",
+            tint = if (isCompleted) Color(0xFFDAA520) else Color.DarkGray
         )
             Text(
                 text = " $localName ",
@@ -165,7 +168,7 @@ fun AchievementCard(
             text = " $localDescription ",
             fontFamily = pixelFontFamily,
             fontSize = 25.sp,
-            color = Color.DarkGray,
+            color = if (isCompleted) Color.Gray else Color.DarkGray,
             modifier = Modifier
         )
         if (achievementPercentCompleted < 275.0) {
