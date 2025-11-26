@@ -44,6 +44,8 @@ android {
 
 dependencies {
     implementation(libs.androidx.compose.ui.text)
+    implementation(libs.androidx.foundation.layout)
+    implementation(libs.androidx.ui)
     val room_version = "2.8.3"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-runtime:$room_version")
