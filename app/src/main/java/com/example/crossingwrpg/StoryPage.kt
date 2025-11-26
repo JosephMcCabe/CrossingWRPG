@@ -2,6 +2,7 @@ package com.example.crossingwrpg
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -137,11 +138,37 @@ fun BattleScreen(
         battleSimulation.advanceBattle()
     }
 
+    Image(
+        painter = painterResource(R.drawable.background_layer_1),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f),
+        contentScale = ContentScale.Crop
+    )
+    Image(
+        painter = painterResource(R.drawable.background_layer_2),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f),
+        contentScale = ContentScale.Crop
+    )
+    Image(
+        painter = painterResource(R.drawable.background_layer_3),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f),
+        contentScale = ContentScale.Crop
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(32.dp)
     ) {
+
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
