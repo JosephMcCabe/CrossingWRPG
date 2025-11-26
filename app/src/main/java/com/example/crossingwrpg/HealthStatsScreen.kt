@@ -93,7 +93,7 @@ fun HealthStatsScreen(
             )
             Spacer(Modifier.height(20.dp))
             PixelText(
-                "Walk Boost",
+                "Stat Boost",
                 fontSize = 40.sp
             )
             Row(
