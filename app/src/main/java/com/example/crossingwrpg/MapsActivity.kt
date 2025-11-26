@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -39,6 +41,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
 import com.example.crossingwrpg.data.UserViewModel
 import com.example.crossingwrpg.data.InventoryViewModel
 import kotlinx.coroutines.isActive
@@ -175,6 +180,21 @@ fun MapsWithPedometerScreen(
             image = R.drawable.background_layer_3,
             speedPxPerSec = 60f
         )
+
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(R.drawable.pixelsoldier)
+                .decoderFactory(ImageDecoderDecoder.Factory())
+                .build(),
+            contentDescription = "soldier Image",
+            modifier = Modifier
+                .size(180.dp)
+                .align(Alignment.Center)
+                .offset(y = -20.dp),
+            contentScale = ContentScale.Fit,
+            filterQuality = FilterQuality.None
+        )
+
 
         Card(
             modifier = Modifier
@@ -376,7 +396,7 @@ private fun ScrollingBackground(
             painter = painterResource(image),
             contentDescription = null,
             modifier = Modifier
-                .height(maxHeight * 2 / 3)
+                .height(maxHeight / 2)
                 .width(widthDp)
                 .offset { IntOffset(firstX, 0) },
             contentScale = ContentScale.FillBounds
@@ -385,7 +405,7 @@ private fun ScrollingBackground(
             painter = painterResource(image),
             contentDescription = null,
             modifier = Modifier
-                .height(maxHeight * 2 / 3)
+                .height(maxHeight / 2)
                 .width(widthDp)
                 .offset { IntOffset(secondX, 0) },
             contentScale = ContentScale.FillBounds

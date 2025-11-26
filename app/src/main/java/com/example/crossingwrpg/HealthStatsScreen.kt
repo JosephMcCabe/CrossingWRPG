@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.decode.GifDecoder
 import coil.request.ImageRequest
@@ -18,7 +19,8 @@ fun HealthStatsScreen(
     steps: Int = 0,
     time: Int = 0,
     userVm: UserViewModel,
-    inventoryVm: InventoryViewModel
+    inventoryVm: InventoryViewModel,
+    navController: NavHostController
 ) {
     val user = userVm.userFlow.collectAsState(initial = null).value
 
@@ -128,7 +130,9 @@ fun HealthStatsScreen(
                 )
                 ActionButton(
                     text = "Continue",
-                    onClick = { /* Navigate to battle */ }
+                    onClick = {
+                        navController.navigate("narrative_page")
+                    }
                 )
             }
         }

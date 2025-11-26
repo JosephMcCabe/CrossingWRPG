@@ -191,8 +191,12 @@ fun AppNavigation(
                     steps = steps,
                     time = time,
                     userVm = userVm,
-                    inventoryVm = inventoryVm
+                    inventoryVm = inventoryVm,
+                    navController = navController
                 )
+            }
+            composable(route = "narrative_page") {
+                NarrativeScreen(navController = navController)
             }
             composable(route = Destination.ACHIEVEMENTS_SCREEN.route) {
                 AchievementsScreenFunction(navController = navController)
