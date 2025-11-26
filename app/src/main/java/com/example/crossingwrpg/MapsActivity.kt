@@ -1,14 +1,21 @@
 package com.example.crossingwrpg
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -24,15 +31,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.crossingwrpg.data.UserViewModel
 import com.example.crossingwrpg.data.InventoryViewModel
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import kotlinx.coroutines.isActive
+import kotlin.math.roundToInt
 
 enum class WalkingState { Idle, Walking, Paused }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -146,18 +156,24 @@ fun MapsWithPedometerScreen(
 
     MusicPlayer.pause()
 
-    val channelIslands = LatLng(34.161767, -119.043377)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(channelIslands, 13f)
-    }
-
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            uiSettings = MapUiSettings(zoomControlsEnabled = false)
+
+        ScrollingBackground(
+            isScrolling = walkState == WalkingState.Walking,
+            image = R.drawable.background_layer_1,
+            speedPxPerSec = 20f
+        )
+        ScrollingBackground(
+            isScrolling = walkState == WalkingState.Walking,
+            image = R.drawable.background_layer_2,
+            speedPxPerSec = 40f
+        )
+        ScrollingBackground(
+            isScrolling = walkState == WalkingState.Walking,
+            image = R.drawable.background_layer_3,
+            speedPxPerSec = 60f
         )
 
         Card(
@@ -323,5 +339,56 @@ fun MapsWithPedometerScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ScrollingBackground(
+    isScrolling: Boolean,
+    image: Int,
+    speedPxPerSec: Float,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val density = LocalDensity.current
+        val widthDp= maxHeight * (16f / 9f)
+        val widthPx = with(density) { maxWidth.toPx() }
+        val anim = remember { Animatable(0f) }
+
+        LaunchedEffect(isScrolling, widthPx, speedPxPerSec) {
+            if (!isScrolling || widthPx <= 0f || speedPxPerSec <= 0f) return@LaunchedEffect
+
+            while (isActive) {
+                val duration = ((widthPx / speedPxPerSec) * 1000f).toInt().coerceAtLeast(1)
+                anim.snapTo(0f)
+                anim.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(durationMillis = duration, easing = LinearEasing)
+                )
+            }
+        }
+
+        val offset = -(anim.value * widthPx)
+        val firstX = offset.roundToInt()
+        val secondX = (offset + widthPx).roundToInt()
+
+        Image(
+            painter = painterResource(image),
+            contentDescription = null,
+            modifier = Modifier
+                .height(maxHeight * 2 / 3)
+                .width(widthDp)
+                .offset { IntOffset(firstX, 0) },
+            contentScale = ContentScale.FillBounds
+        )
+        Image(
+            painter = painterResource(image),
+            contentDescription = null,
+            modifier = Modifier
+                .height(maxHeight * 2 / 3)
+                .width(widthDp)
+                .offset { IntOffset(secondX, 0) },
+            contentScale = ContentScale.FillBounds
+        )
     }
 }
