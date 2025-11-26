@@ -1,3 +1,5 @@
+@file:Suppress("TYPE_INTERSECTION_AS_REIFIED_WARNING")
+
 package com.example.crossingwrpg.data
 
 import androidx.room.RoomDatabase
@@ -30,8 +32,8 @@ object PopulateItems {
                     name = "Health Potion",
                     description = "Restores a small amount of health.",
                     slotDb = "consumable",
-                    drawableId = R.drawable.pixelpotion,
-                    dropThreshold = 10
+                    drawableId = R.drawable.healthpotion,
+                    dropThreshold = 25
                 )
                 insertItem(
                     db,
@@ -40,16 +42,16 @@ object PopulateItems {
                     description = "A sharp iron blade.",
                     slotDb = "weapon",
                     drawableId = R.drawable.pixelsword,
-                    dropThreshold = 15
+                    dropThreshold = 100
                 )
                 insertItem(
                     db,
                     itemId = 3L,
-                    name = "Purple Potion",
-                    description = "Like a health potion! but purple.",
+                    name = "Mana Potion",
+                    description = "Restores a small amount of mana.",
                     slotDb = "consumable",
-                    drawableId = R.drawable.purplepotion,
-                    dropThreshold = 20
+                    drawableId = R.drawable.manapotion,
+                    dropThreshold = 50
                 )
                 db.setTransactionSuccessful()
             } finally {

@@ -315,7 +315,7 @@ fun BattleScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.pixelpotion),
+                                        painter = painterResource(id = R.drawable.healthpotion),
                                         contentDescription = "Attack Icon",
                                         modifier = Modifier.height(25.dp)
                                     )

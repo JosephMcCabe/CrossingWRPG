@@ -14,26 +14,17 @@ class InventoryViewModel(app: Application) : AndroidViewModel(app) {
         InventoryRepository(db.inventoryDao())
     }
     private val _healthPotionQuantity = MutableStateFlow(0)
-    val healthPotionQuantity: StateFlow<Int> = _healthPotionQuantity.asStateFlow()
-
     private val _sessionEarnedItems = MutableStateFlow<Map<Long, Int>>(emptyMap())
-    val sessionEarnedItem: StateFlow<Map<Long, Int>> = _sessionEarnedItems
-
     private val _allItems = MutableStateFlow<List<Item>>(emptyList())
-    val allItems: StateFlow<List<Item>> =_allItems
+    private val _inventoryWithQuantities = MutableStateFlow<Map<Long, Int>>(emptyMap())
+    val healthPotionQuantity: StateFlow<Int> = _healthPotionQuantity.asStateFlow()
+    val sessionEarnedItem: StateFlow<Map<Long, Int>> = _sessionEarnedItems.asStateFlow()
+    val allItems: StateFlow<List<Item>> = _allItems.asStateFlow()
+    val inventoryWithQuantities: StateFlow<Map<Long, Int>> = _inventoryWithQuantities.asStateFlow()
 
     init {
         loadHealthPotionQuantity()
         loadAllItems()
-    }
-
-    fun loadHealthPotionQuantity() = viewModelScope.launch {
-        _healthPotionQuantity.value = repo.getQuantity(1L)
-    }
-
-    fun useHealthPotion() = viewModelScope.launch {
-        repo.consumeItem(1L)
-        loadHealthPotionQuantity()
     }
 
     fun addEarnedItem(itemId: Long, count: Int = 1) {
@@ -65,11 +56,32 @@ class InventoryViewModel(app: Application) : AndroidViewModel(app) {
         if (itemId == 1L) {
             loadHealthPotionQuantity()
         }
-        loadAllItems()
+        loadInventoryQuantities()
+    }
+    fun useHealthPotion() = viewModelScope.launch {
+        repo.consumeItem(1L)
+        loadHealthPotionQuantity()
+        loadInventoryQuantities()
     }
 
+    fun loadHealthPotionQuantity() = viewModelScope.launch {
+        _healthPotionQuantity.value = repo.getQuantity(1L)
+    }
+    fun loadInventoryQuantities() = viewModelScope.launch {
+        val allItemsList = repo.getAllItems()
+        val quantities = mutableMapOf<Long, Int>()
+
+        allItemsList.forEach { item ->
+            val quantity = repo.getQuantity(item.itemId)
+            if (quantity > 0) {
+                quantities[item.itemId] = quantity
+            }
+        }
+        _inventoryWithQuantities.value = quantities
+    }
     private fun loadAllItems() = viewModelScope.launch {
         _allItems.value = repo.getAllItems()
+        loadInventoryQuantities()
     }
 
 }

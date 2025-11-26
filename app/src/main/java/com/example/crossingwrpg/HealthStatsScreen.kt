@@ -1,75 +1,17 @@
 package com.example.crossingwrpg
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.decode.GifDecoder
+import coil.request.ImageRequest
 import com.example.crossingwrpg.data.InventoryViewModel
 import com.example.crossingwrpg.data.UserViewModel
-
-@Composable
-fun ItemWithCount(
-    name: String,
-    itemID: Int,
-    count: Int,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        PixelText(
-            name,
-            fontSize = 18.sp
-        )
-        Spacer(Modifier.height(4.dp))
-
-        Box(
-            modifier = modifier.wrapContentSize()
-        ) {
-            Image(
-                painter = painterResource(itemID),
-                contentDescription = name,
-                modifier = Modifier
-                    .size(64.dp)
-                    .padding(4.dp)
-            )
-
-            if (count > 1) {
-                PixelText(
-                    "x$count",
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 8.dp, y = (-8).dp)
-                        .background(Color.White, CircleShape)
-                        .border(BorderStroke(1.dp, Color.Black), CircleShape)
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun HealthStatsScreen(
@@ -81,13 +23,24 @@ fun HealthStatsScreen(
     val user = userVm.userFlow.collectAsState(initial = null).value
 
     val earnedItems by inventoryVm.sessionEarnedItem.collectAsState()
-    val totalItemCount = earnedItems.values.sum()
+    val allItems by inventoryVm.allItems.collectAsState(initial = emptyList())
 
-    var showRewardDialog by remember(steps, totalItemCount) { mutableStateOf(false) }
+    val totalItemCount = earnedItems.values.sum()
+    val hasEarnedRewards = earnedItems.isNotEmpty()
+
+    var showRewardDialog by remember { mutableStateOf(false) }
+    var showInventoryDialog by remember { mutableStateOf(false) }
+    var displayedEarnedItems by remember { mutableStateOf<Map<Long, Int>>(emptyMap()) }
 
     LaunchedEffect(steps, totalItemCount) {
-        if (earnedItems.isNotEmpty() && steps >= 10) {
+        if (hasEarnedRewards && displayedEarnedItems.isEmpty()) {
+            displayedEarnedItems = earnedItems
             showRewardDialog = true
+        }
+    }
+    LaunchedEffect(showRewardDialog) {
+        if (!showRewardDialog && earnedItems.isNotEmpty()) {
+            inventoryVm.commitEarnedItems()
         }
     }
     DisposableEffect(Unit) {
@@ -104,118 +57,92 @@ fun HealthStatsScreen(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
-        )
-        {
+        ) {
             PixelText(
                 "Walk Summary",
-                fontSize = 50.sp,
+                fontSize = 50.sp
             )
-            Spacer(
-                Modifier.height(16.dp)
-            )
+            Spacer(Modifier.height(16.dp))
+
             PixelText(
                 "Steps taken: $steps",
-                fontSize = 35.sp,
+                fontSize = 35.sp
             )
             PixelText(
                 "Time elapsed: ${time}s",
-                fontSize = 35.sp,
+                fontSize = 35.sp
             )
             PixelText(
                 "Total steps: ${user?.totalSteps ?: 0}",
-                fontSize = 35.sp,
-            )
-            PixelText(
-                "Total time: ${user?.totalWalkingSeconds ?: 0}",
                 fontSize = 35.sp
             )
-            Spacer(Modifier.height(32.dp))
-            if (steps >= 10 && earnedItems.isNotEmpty()) {
+            PixelText(
+                "Total time: ${user?.totalWalkingSeconds ?: 0}s",
+                fontSize = 35.sp
+            )
+            Spacer(Modifier.height(20.dp))
+            PixelText(
+                "Walk Boost",
+                fontSize = 40.sp
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
                 PixelText(
-                    "Items found: $totalItemCount",
+                    "Speed: ${user?.speed}",
                     fontSize = 35.sp
                 )
-                Spacer(Modifier.height(8.dp))
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    earnedItems.forEach { (itemId, count) ->
-                        val allItems by inventoryVm.allItems.collectAsState(initial = emptyList())
-                        val droppableItem = allItems.find {it.itemId == itemId}
-                        if (droppableItem != null) {
-                            val drawable = when (itemId) {
-                                1L -> R.drawable.pixelpotion
-                                2L -> R.drawable.pixelsword
-                                3L -> R.drawable.purplepotion
-                                else -> R.drawable.pixelpotion
-                            }
-                            ItemWithCount(
-                                name = droppableItem.name,
-                                itemID = drawable,
-                                count = count,
-                                modifier = Modifier.weight(1f, fill = false)
-                            )
+                Spacer(Modifier.width(8.dp))
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(R.drawable.greenarrow)
+                        .decoderFactory(GifDecoder.Factory())
+                        .build(),
+                    contentDescription = "Speed increase",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(Modifier.height(32.dp))
+            if (displayedEarnedItems.isNotEmpty()) {
+                EarnedItemsDisplay(
+                    earnedItems = displayedEarnedItems,
+                    allItems = allItems
+                )
+            }
+            Spacer(Modifier.height(50.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ActionButton(
+                    text = "Inventory",
+                    onClick = {
+                        if (earnedItems.isNotEmpty()) {
+                            inventoryVm.commitEarnedItems()
                         }
+                        showInventoryDialog = true
                     }
-                }
+                )
+                ActionButton(
+                    text = "Continue",
+                    onClick = { /* Navigate to battle */ }
+                )
             }
         }
     }
     if (showRewardDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showRewardDialog = false
-            },
-            containerColor = Color.White,
-            title = {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    PixelText(
-                        "ITEMS FOUND!",
-                        fontSize = 30.sp
-                    )
-                }
-            },
-            text = {
-                val message = if (totalItemCount == 1) {
-                    "As you were walking you picked up 1 item!"
-                } else {
-                    "As you were walking you came across $totalItemCount items!"
-                }
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    PixelText(
-                        message,
-                        fontSize = 25.sp
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showRewardDialog = false
-                    },
-                    colors = ButtonDefaults.textButtonColors(
-                        containerColor = Color.Black.copy(alpha = 0.8f),
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    PixelText(
-                        "OK",
-                        fontSize = 25.sp
-                    )
-                }
-            }
+        RewardDialog(
+            totalItemCount = totalItemCount,
+            onDismiss = { showRewardDialog = false }
+        )
+    }
+    if (showInventoryDialog) {
+        InventoryScreen(
+            inventoryVm = inventoryVm,
+            onDismiss = { showInventoryDialog = false }
         )
     }
 }

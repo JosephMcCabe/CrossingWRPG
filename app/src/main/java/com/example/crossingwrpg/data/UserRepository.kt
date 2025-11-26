@@ -29,7 +29,7 @@ class UserRepository(private val dao: UserDao) {
         val updatedUser = user.copy(
             totalSteps = user.totalSteps + steps,
             totalWalkingSeconds = user.totalWalkingSeconds + seconds,
-            speed = (user.totalSteps.toInt() + steps) / 10
+            speed = 1 + (user.totalSteps.toInt() + steps) / 100
         )
         dao.updateUser(updatedUser)
     }
