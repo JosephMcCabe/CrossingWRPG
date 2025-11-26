@@ -1,10 +1,13 @@
 package com.example.crossingwrpg
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -57,6 +60,12 @@ fun HealthStatsScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+        Image(
+            painter = painterResource(R.drawable.scroll_background),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -84,7 +93,7 @@ fun HealthStatsScreen(
             )
             Spacer(Modifier.height(20.dp))
             PixelText(
-                "Walk Boost",
+                "Stat Boost",
                 fontSize = 40.sp
             )
             Row(
@@ -92,7 +101,7 @@ fun HealthStatsScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 PixelText(
-                    "Speed: ${user?.speed}",
+                    "Attack Speed: ${user?.speed}",
                     fontSize = 35.sp
                 )
                 Spacer(Modifier.width(8.dp))
