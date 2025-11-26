@@ -1,5 +1,7 @@
 package com.example.crossingwrpg
 
+import android.content.Intent
+import android.os.Build
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -61,6 +63,18 @@ fun MapsWithPedometerScreen(
     inventoryVm: InventoryViewModel
 ) {
     val context = LocalContext.current
+    val appContext = context.applicationContext
+
+    fun sendWalkServiceAction(action: String) {
+        val intent = Intent(appContext, WalkService::class.java).apply {
+            this.action = action
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            appContext.startForegroundService(intent)
+        } else {
+            appContext.startService(intent)
+        }
+    }
     val osTotalStepCount by pedometer.stepCount.collectAsState(initial = 0L)
 
     var appTotalSteps: Long by remember {
@@ -253,6 +267,7 @@ fun MapsWithPedometerScreen(
                                     pedometer.debugAddSteps(100)
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
+                                    sendWalkServiceAction(WalkService.ACTION_START)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,
@@ -273,6 +288,7 @@ fun MapsWithPedometerScreen(
                                     stopwatch.stop()
                                     walkState = WalkingState.Paused
                                     isPedometerActive = false
+                                    sendWalkServiceAction(WalkService.ACTION_PAUSE)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Black,
@@ -289,6 +305,7 @@ fun MapsWithPedometerScreen(
                                     pedometer.stop()
                                     stopwatch.stop()
                                     isPedometerActive = false
+                                    sendWalkServiceAction(WalkService.ACTION_STOP)
 
                                     userVm.recordWalk(sessionSteps.toInt(), elapsedTime)
 
@@ -318,6 +335,7 @@ fun MapsWithPedometerScreen(
                                     stopwatch.start()
                                     walkState = WalkingState.Walking
                                     isPedometerActive = true
+                                    sendWalkServiceAction(WalkService.ACTION_RESUME)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Green,
@@ -334,6 +352,7 @@ fun MapsWithPedometerScreen(
                                     pedometer.stop()
                                     stopwatch.stop()
                                     isPedometerActive = false
+                                    sendWalkServiceAction(WalkService.ACTION_STOP)
 
                                     userVm.recordWalk(sessionSteps.toInt(), elapsedTime)
 

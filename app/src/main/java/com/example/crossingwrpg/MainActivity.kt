@@ -64,8 +64,7 @@ class MainActivity : ComponentActivity() {
         MusicPlayer.createPlayer(applicationContext)
 
         pedometer = Pedometer(
-            context = applicationContext,
-            battleSimulation = battleSimulation
+            context = applicationContext
         )
         notifications = Notifications(applicationContext).apply { initChannel() }
         pedometer.start()
