@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        MusicPlayer.createPlayer(applicationContext)
+        MusicPlayer.preparePlayer(applicationContext)
 
         pedometer = Pedometer(
             context = applicationContext

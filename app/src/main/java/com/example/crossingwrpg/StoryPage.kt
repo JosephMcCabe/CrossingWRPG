@@ -234,10 +234,10 @@ fun BattleScreen(
                             )
 
                             battleWon = false
-                            MusicPlayer.createPlayer(context)
+                            MusicPlayer.preparePlayer(context)
                             MusicPlayer.changeSong("xdeviruchidecisivebattle")
                             MusicPlayer.play()
-                            MusicPlayer.loop(true)
+                            MusicPlayer.loop()
 
                         }
 
@@ -356,12 +356,11 @@ fun BattleScreen(
                     }
 
                     is BattleState.End -> {
-                        MusicPlayer.changeSong("victory1")
-                        MusicPlayer.loop(false)
-
-                        if (!battleWon)
+                        if (battleWon == false) { // Runs once when on battle end
                             userVm.updateDefeatedEnemies()
-
+                            MusicPlayer.changeSong("victory1")
+                            MusicPlayer.unloop()
+                        }
                         battleWon = true
 
                         Button(

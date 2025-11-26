@@ -10,7 +10,7 @@ import androidx.core.net.toUri
 object MusicPlayer {
     private var player: ExoPlayer? = null
 
-    fun createPlayer(context: Context) {
+    fun preparePlayer(context: Context) {
         if (player == null) {
             player = ExoPlayer.Builder(context.applicationContext).build()
             player?.prepare()
@@ -34,15 +34,12 @@ object MusicPlayer {
         player?.pause()
     }
 
-    fun loop(boolean: Boolean) {
-        if (boolean)
+    fun loop() {
             player?.repeatMode = REPEAT_MODE_ALL
-        else
-            player?.repeatMode = REPEAT_MODE_OFF
     }
 
-    fun seek(seconds: Double) {
-        player?.seekTo((seconds * 1000).toLong())
+    fun unloop() {
+        player?.repeatMode = REPEAT_MODE_OFF
     }
 
     fun free() {
