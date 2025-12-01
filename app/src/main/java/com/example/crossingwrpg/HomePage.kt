@@ -4,18 +4,22 @@ import android.Manifest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -74,9 +78,27 @@ fun HomePage() {
         modifier = Modifier.fillMaxSize()
     ) {
         Image(
-            painter = painterResource(R.drawable.purple_pixel_background),
+            painter = painterResource(R.drawable.background_layer_1),
             contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .requiredHeight(650.dp)
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Image(
+            painter = painterResource(R.drawable.background_layer_2),
+            contentDescription = null,
+            modifier = Modifier
+                .requiredHeight(650.dp)
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Image(
+            painter = painterResource(R.drawable.background_layer_3),
+            contentDescription = null,
+            modifier = Modifier
+                .requiredHeight(650.dp)
+                .fillMaxSize(),
             contentScale = ContentScale.Crop
         )
 
@@ -90,39 +112,47 @@ fun HomePage() {
                     .data(R.drawable.pixelsoldier)
                     .decoderFactory(ImageDecoderDecoder.Factory())
                     .build(),
-                contentDescription = "Goblin Image",
+                contentDescription = "Soldier Sprite",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .size(100.dp)
-                    .offset(x = 20.dp, y = 60.dp),
+                    .size(400.dp)
+                    .offset(x = 0.dp, y = 200.dp),
                 contentScale = ContentScale.Crop,
                 filterQuality = FilterQuality.None
             )
         }
 
-        Text(
-            text = "Crossing",
-            fontFamily = pixelFontFamily,
-            textAlign = TextAlign.Center,
-            fontSize = 70.sp,
-            color = Color.Black,
+        Card(
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 30.dp)
-                .padding(16.dp)
-        )
-        Text(
-            text = "A Walking RPG",
-            fontFamily = pixelFontFamily,
-            textAlign = TextAlign.Center,
-            fontSize = 25.sp,
-            color = Color.DarkGray,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 76.dp)
-                .padding(16.dp)
-        )
+                .padding(1.dp)
+                .height(100.dp)
+                .offset(y = 15.dp)
+                .border(1.dp, Color.White, RoundedCornerShape(12.dp)),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Black.copy(alpha = 0.3f)
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Crossing",
+                    fontFamily = pixelFontFamily,
+                    textAlign = TextAlign.Center,
+                    fontSize = 70.sp,
+                    color = Color.LightGray
+                )
+                Text(
+                    text = "A Walking RPG",
+                    fontFamily = pixelFontFamily,
+                    textAlign = TextAlign.Center,
+                    fontSize = 25.sp,
+                    color = Color.LightGray
+                )
+            }
+        }
         Text(
             text = "Hi, ${user?.name ?: "Walker"}",
             fontFamily = pixelFontFamily,
