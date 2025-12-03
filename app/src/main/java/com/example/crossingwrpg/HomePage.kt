@@ -114,8 +114,8 @@ fun HomePage() {
                     .build(),
                 contentDescription = "Soldier Sprite",
                 modifier = Modifier
-                    .size(400.dp)
-                    .offset(x = 0.dp, y = 200.dp),
+                    .size(500.dp)
+                    .offset(x = 0.dp, y = 180.dp),
                 contentScale = ContentScale.Crop,
                 filterQuality = FilterQuality.None
             )
@@ -157,7 +157,7 @@ fun HomePage() {
             text = "Hi, ${user?.name ?: "Walker"}",
             fontFamily = pixelFontFamily,
             textAlign = TextAlign.Center,
-            fontSize = 25.sp,
+            fontSize = 30.sp,
             color = Color.DarkGray,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
