@@ -3,6 +3,7 @@ package com.example.crossingwrpg
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -79,26 +82,41 @@ fun CharacterHealthBar(
     }
     val trackColor = Color.Gray.copy(alpha = 0.3f)
 
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Card(
+        modifier = Modifier
+            .height(80.dp)
+            .width(600.dp)
+            .border(0.5.dp, Color.Transparent, RoundedCornerShape(12.dp)),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isPlayer) Color.White.copy(alpha = 0.2f) else Color.Black.copy(alpha = 0.2f)
+        )
     ) {
-        Text(
-            text = "${character.name}: ${character.currentHealth.coerceAtLeast(0)}/${character.maxHealth} HP",
-            fontFamily = pixelFontFamily,
-            fontSize = 30.sp,
-        )
-        Spacer(Modifier.height(4.dp))
+        Column(
+            modifier = modifier
+                .fillMaxHeight()
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "${character.name}: ${character.currentHealth.coerceAtLeast(0)}/${character.maxHealth} HP",
+                fontFamily = pixelFontFamily,
+                fontSize = 30.sp,
+                color = if (isPlayer) Color.Black else Color.White
+            )
+            Spacer(Modifier.height(10.dp))
 
-        LinearProgressIndicator(
-            progress = { animatedProgress },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(10.dp),
-            color = healthBarColor,
-            trackColor = trackColor,
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-        )
+            LinearProgressIndicator(
+                progress = { animatedProgress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
+                    .height(12.dp),
+                color = healthBarColor,
+                trackColor = trackColor,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+            )
+        }
     }
 }
 
@@ -142,24 +160,24 @@ fun BattleScreen(
         painter = painterResource(R.drawable.background_layer_1),
         contentDescription = null,
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.5f),
+            .requiredHeight(450.dp)
+            .fillMaxSize(),
         contentScale = ContentScale.Crop
     )
     Image(
         painter = painterResource(R.drawable.background_layer_2),
         contentDescription = null,
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.5f),
+            .requiredHeight(450.dp)
+            .fillMaxSize(),
         contentScale = ContentScale.Crop
     )
     Image(
         painter = painterResource(R.drawable.background_layer_3),
         contentDescription = null,
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.5f),
+            .requiredHeight(450.dp)
+            .fillMaxSize(),
         contentScale = ContentScale.Crop
     )
 
@@ -187,8 +205,8 @@ fun BattleScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(2f)
-                    .padding(vertical = 8.dp),
+                    .weight(2.5f)
+                    .padding(vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -199,9 +217,9 @@ fun BattleScreen(
                         .build(),
                     contentDescription = "Goblin Image",
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    contentScale = ContentScale.Crop,
+                        .width(450.dp)
+                        .height(450.dp),
+                    contentScale = ContentScale.Fit,
                     filterQuality = FilterQuality.High
                 )
             }
