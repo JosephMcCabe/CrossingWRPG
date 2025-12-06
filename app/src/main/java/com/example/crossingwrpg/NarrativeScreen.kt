@@ -22,6 +22,10 @@ import androidx.navigation.NavHostController
 fun NarrativeScreen(
     navController: NavHostController
 ) {
+
+    MusicPlayer.changeSong("lostshrine")
+    MusicPlayer.play()
+
     val scrollState = rememberScrollState()
     Box(
         modifier = Modifier
@@ -71,6 +75,7 @@ fun NarrativeScreen(
                 text = "Continue",
                 onClick = {
                     navController.navigate(Destination.BATTLE.route)
+                    MusicPlayer.changeSong("xdeviruchidecisivebattle")
                 }
             )
             Spacer(Modifier.height(8.dp))

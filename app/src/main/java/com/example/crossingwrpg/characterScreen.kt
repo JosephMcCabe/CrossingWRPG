@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,17 +58,27 @@ fun CharacterScreen(
     val user = userVm.userFlow.collectAsState(initial = null).value
 
     MusicPlayer.pause()
-
+    Column(
+        modifier = Modifier
+            .offset(y = 0.dp)
+            .height(525.dp)
+            .width(550.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
     Box(
+        contentAlignment = Alignment.CenterStart,
         modifier = Modifier
             .fillMaxSize()
     ) {
         Image(
             painter = painterResource(R.drawable.forestbackground),
             contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .align(Alignment.TopCenter),
             contentScale = ContentScale.Crop
         )
+        }
     }
 
     Column(
@@ -81,7 +92,7 @@ fun CharacterScreen(
                 .fillMaxWidth()
                 .padding(16.dp)
                 .height(IntrinsicSize.Min)
-                .border(3.dp, Color.Green, RoundedCornerShape(12.dp)),
+                .border(3.dp, Color.Yellow, RoundedCornerShape(12.dp)),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
             ),
@@ -115,7 +126,7 @@ fun CharacterScreen(
             contentDescription = "Goblin Image",
             modifier = Modifier
                 .size(180.dp)
-                .offset(y = 230.dp),
+                .offset(y = 15.dp),
             contentScale = ContentScale.Fit,
             filterQuality = FilterQuality.None
         )
@@ -126,31 +137,35 @@ fun CharacterScreen(
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .offset(15.dp, 105.dp),
-        contentAlignment = Alignment.CenterStart
+        .offset(15.dp, 35.dp),
+        contentAlignment = Alignment.TopStart
     ) {
         Column (
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(75.dp)
-                .clickable(onClick = { if (enableCustomizationPopup == false) {
-                    customizationName = "Helmets"
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
-            )
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(75.dp).clickable(onClick = { if (enableCustomizationPopup == false) {
+            Image(
+                painter = painterResource(R.drawable.customizable_helmet),
+                contentDescription = "test",
+                modifier = Modifier
+                    .size(115.dp)
+                    .offset(x = -5.dp)
+                    .clickable(onClick = { if (enableCustomizationPopup == false) {
+                        customizationName = "Helmets"
+                        enableCustomizationPopup = true
+                    }
+                    else {
+                        enableCustomizationPopup = false
+                    }
+                    })
+                )
+            Image(
+                painter = painterResource(R.drawable.customizable_chestplate),
+                contentDescription = "test",
+                modifier = Modifier
+                    .size(115.dp)
+                    .offset(x = -5.dp)
+                    .clickable(onClick = {
+                        if (enableCustomizationPopup == false) {
                     customizationName = "Chestplates"
                     enableCustomizationPopup = true
                 }
@@ -159,10 +174,12 @@ fun CharacterScreen(
                 }
                 })
             )
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
+            Image(
+                painter = painterResource(R.drawable.customizable_effect),
+                contentDescription = "test",
+                modifier = Modifier
+                    .size(115.dp)
+                    .offset(x = -5.dp)
                 .size(75.dp).clickable(onClick = { if (enableCustomizationPopup == false) {
                     customizationName = "Pants"
                     enableCustomizationPopup = true
@@ -172,46 +189,44 @@ fun CharacterScreen(
                 }
                 })
             )
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(75.dp)
-                .clickable(onClick = { if (enableCustomizationPopup == false) {
-                    customizationName = "Shoes"
+            Image(
+                painter = painterResource(R.drawable.customizable_shoe),
+                contentDescription = "test",
+                modifier = Modifier
+                    .size(115.dp)
+                    .offset(x = -5.dp)
+                    .clickable(onClick = { if (enableCustomizationPopup == false) {
+                        customizationName = "Shoes"
 
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
-            ) {
-
+                        enableCustomizationPopup = true
+                    }
+                    else {
+                        enableCustomizationPopup = false
+                    }
+                    }))
             }
         }
-    }
     Box(modifier = Modifier
         .fillMaxSize()
-        .offset(-15.dp, 95.dp),
-        contentAlignment = Alignment.CenterEnd
+        .offset(-15.dp, 195.dp),
+        contentAlignment = Alignment.TopEnd
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(30.dp)
         ) {
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(75.dp)
-                .clickable(onClick = { if (enableCustomizationPopup == false) {
-                    customizationName = "Weaponry"
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
+            Image(
+                painter = painterResource(R.drawable.customizable_weaponry),
+                contentDescription = "test",
+                modifier = Modifier
+                    .size(115.dp)
+                    .clickable(onClick = { if (enableCustomizationPopup == false) {
+                        customizationName = "Weaponry"
+                        enableCustomizationPopup = true
+                    }
+                    else {
+                        enableCustomizationPopup = false
+                    }
+                    })
             )
         }
     }
@@ -223,11 +238,12 @@ fun CharacterScreen(
 
 @Composable
 fun CreateCustomizationItem(id: Int) {
-    Box(modifier = Modifier
-        .clip(RoundedCornerShape(12.dp))
-        .background(Color.LightGray)
-        .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-        .size(75.dp)
+    Image(
+        painter = painterResource(R.drawable.customizable_slot),
+        contentDescription = "test",
+        modifier = Modifier
+            .size(96.dp)
+            .clip(RoundedCornerShape(38.dp))
     )
     if (id >= 0) {
         val drawable = when (id) {
@@ -245,6 +261,7 @@ fun CustomizationImage(id: Int) {
         contentDescription = "test",
         modifier = Modifier
             .size(64.dp)
+            .offset(y = 15.dp)
             .padding(4.dp))
 }
 

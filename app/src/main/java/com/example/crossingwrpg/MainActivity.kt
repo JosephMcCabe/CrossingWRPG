@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (screenName == "story_page")
+        if (screenName == "story_page" || screenName == "narrative_page")
             MusicPlayer.play()
     }
 
