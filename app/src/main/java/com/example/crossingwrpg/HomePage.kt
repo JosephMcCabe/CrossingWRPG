@@ -70,7 +70,7 @@ fun HomePage() {
         )
     }
 
-    if (needsName) {
+    if (needsName == true) {
         NameDialog(onConfirm = { name -> userVm.saveName(name) })
     }
 

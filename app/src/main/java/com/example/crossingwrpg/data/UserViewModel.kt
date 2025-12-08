@@ -21,12 +21,13 @@ class UserViewModel(app: Application) : AndroidViewModel(app) {
         initialValue = null
     )
 
-    val needsName: StateFlow<Boolean> = userFlow
-        .map { it?.name.isNullOrBlank() }
+    val needsName: StateFlow<Boolean?> = userFlow
+        .map { user ->
+            user?.name?.isBlank() }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            true
+            null
         )
 
     fun saveName(name: String) = viewModelScope.launch {
