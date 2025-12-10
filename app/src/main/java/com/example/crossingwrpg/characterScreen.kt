@@ -1,5 +1,6 @@
 package com.example.crossingwrpg
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -48,7 +50,7 @@ import com.example.crossingwrpg.data.UserViewModel
 
 private var customizationName = "Default"
 
-private data class characterEquip(var helmet: Int, var chestplate: Int, var bottoms: Int, var boots: Int, var weaponry: Int)
+private data class CharacterEquipment(var helmet: Int, var chestplate: Int, var bottoms: Int, var boots: Int, var weaponry: Int)
 
 @Composable
 fun CharacterScreen(
@@ -56,6 +58,9 @@ fun CharacterScreen(
 ) {
     val userVm: UserViewModel = viewModel()
     val user = userVm.userFlow.collectAsState(initial = null).value
+
+    val lightBrown = Color(0xff915f2f)
+    val darkBrown = Color(0xff87573C)
 
     MusicPlayer.pause()
     Column(
@@ -80,6 +85,33 @@ fun CharacterScreen(
         )
         }
     }
+
+    Box(
+        contentAlignment = Alignment.CenterStart,
+        modifier = Modifier
+            .offset(y = 525.dp)
+            .height(265.dp)
+            .background(lightBrown)
+    ) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .border(BorderStroke(19.dp, darkBrown), RectangleShape)
+        )
+
+        LazyVerticalGrid(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(23.dp),
+            columns = GridCells.Adaptive(minSize = 65.dp),
+        ) {
+            item { CreateCustomizationItem(0) }
+            item { CreateCustomizationItem(-1) }
+            item { CreateCustomizationItem(-1) }
+            item { CreateCustomizationItem(2) }
+
+        }
+    }
+
 
     Column(
         modifier = Modifier
@@ -137,49 +169,49 @@ fun CharacterScreen(
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .offset(15.dp, 35.dp),
-        contentAlignment = Alignment.TopStart
+        .offset((-102).dp, 25.dp),
+        contentAlignment = Alignment.Center
     ) {
         Column (
-            verticalArrangement = Arrangement.spacedBy(1.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Image(
-                painter = painterResource(R.drawable.customizable_helmet),
-                contentDescription = "test",
-                modifier = Modifier
-                    .size(115.dp)
-                    .offset(x = -5.dp)
-                    .clickable(onClick = { if (enableCustomizationPopup == false) {
-                        customizationName = "Helmets"
-                        enableCustomizationPopup = true
-                    }
-                    else {
-                        enableCustomizationPopup = false
-                    }
-                    })
-                )
-            Image(
-                painter = painterResource(R.drawable.customizable_chestplate),
-                contentDescription = "test",
-                modifier = Modifier
-                    .size(115.dp)
-                    .offset(x = -5.dp)
-                    .clickable(onClick = {
-                        if (enableCustomizationPopup == false) {
-                    customizationName = "Chestplates"
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
-            )
+           //Image(
+           //    painter = painterResource(R.drawable.customizable_helmet),
+           //    contentDescription = "",
+           //    modifier = Modifier
+           //        .size(73.dp)
+           //        .offset(x = (-5).dp)
+           //        .clickable(onClick = { if (enableCustomizationPopup == false) {
+           //            customizationName = "Helmets"
+           //            enableCustomizationPopup = true
+           //        }
+           //        else {
+           //            enableCustomizationPopup = false
+           //        }
+           //        })
+           //    )
+           //Image(
+           //    painter = painterResource(R.drawable.customizable_chestplate),
+           //    contentDescription = "",
+           //    modifier = Modifier
+           //        .size(73.dp)
+           //        .offset(x = (-5).dp)
+           //        .clickable(onClick = {
+           //            if (enableCustomizationPopup == false) {
+           //        customizationName = "Chestplates"
+           //        enableCustomizationPopup = true
+           //    }
+           //    else {
+           //        enableCustomizationPopup = false
+           //    }
+           //    })
+           //)
             Image(
                 painter = painterResource(R.drawable.customizable_effect),
-                contentDescription = "test",
+                contentDescription = "",
                 modifier = Modifier
-                    .size(115.dp)
-                    .offset(x = -5.dp)
+                    .size(73.dp)
+                    .offset(x = (-5).dp)
                 .size(75.dp).clickable(onClick = { if (enableCustomizationPopup == false) {
                     customizationName = "Pants"
                     enableCustomizationPopup = true
@@ -189,36 +221,36 @@ fun CharacterScreen(
                 }
                 })
             )
-            Image(
-                painter = painterResource(R.drawable.customizable_shoe),
-                contentDescription = "test",
-                modifier = Modifier
-                    .size(115.dp)
-                    .offset(x = -5.dp)
-                    .clickable(onClick = { if (enableCustomizationPopup == false) {
-                        customizationName = "Shoes"
+           //Image(
+           //    painter = painterResource(R.drawable.customizable_shoe),
+           //    contentDescription = "",
+           //    modifier = Modifier
+           //        .size(73.dp)
+           //        .offset(x = (-5).dp)
+           //        .clickable(onClick = { if (enableCustomizationPopup == false) {
+           //            customizationName = "Shoes"
 
-                        enableCustomizationPopup = true
-                    }
-                    else {
-                        enableCustomizationPopup = false
-                    }
-                    }))
-            }
+           //            enableCustomizationPopup = true
+           //        }
+           //        else {
+           //            enableCustomizationPopup = false
+           //        }
+           //        }))
+           }
         }
     Box(modifier = Modifier
         .fillMaxSize()
-        .offset(-15.dp, 195.dp),
-        contentAlignment = Alignment.TopEnd
+        .offset(102.dp, 25.dp),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(30.dp)
         ) {
             Image(
                 painter = painterResource(R.drawable.customizable_weaponry),
-                contentDescription = "test",
+                contentDescription = "",
                 modifier = Modifier
-                    .size(115.dp)
+                    .size(73.dp)
                     .clickable(onClick = { if (enableCustomizationPopup == false) {
                         customizationName = "Weaponry"
                         enableCustomizationPopup = true
@@ -240,10 +272,9 @@ fun CharacterScreen(
 fun CreateCustomizationItem(id: Int) {
     Image(
         painter = painterResource(R.drawable.customizable_slot),
-        contentDescription = "test",
+        contentDescription = "",
         modifier = Modifier
-            .size(96.dp)
-            .clip(RoundedCornerShape(38.dp))
+            .size(73.dp)
     )
     if (id >= 0) {
         val drawable = when (id) {
@@ -258,10 +289,10 @@ fun CreateCustomizationItem(id: Int) {
 fun CustomizationImage(id: Int) {
     Image(
         painter = painterResource(id),
-        contentDescription = "test",
+        contentDescription = "",
         modifier = Modifier
             .size(64.dp)
-            .offset(y = 15.dp)
+            .offset(y = 5.dp)
             .padding(4.dp))
 }
 
@@ -291,7 +322,7 @@ fun CustomizationPopup(titleName: String) {
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .offset(y = 95.dp),
-                columns = GridCells.Adaptive(minSize = 75.dp),
+                columns = GridCells.Adaptive(minSize = 73.dp),
             ) {
                 if (titleName == "Helmets") {
                     item { CreateCustomizationItem(-1) }
