@@ -3,6 +3,7 @@ package com.example.crossingwrpg.data
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -15,14 +16,12 @@ class UserViewModel(app: Application) : AndroidViewModel(app) {
         UserRepository(db.userDao(), app.applicationContext)
     }
 
-    val userFlow: StateFlow<User?> = repo.userFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
+    private val _user = MutableStateFlow<User?>(null)
+    val userFlow: StateFlow<User?> = _user
 
-    val needsName: StateFlow<Boolean> = userFlow
-        .map { it?.name.isNullOrBlank() }
+    val needsName: StateFlow<Boolean> = _user
+        .map { user ->
+            user?.name.isNullOrBlank() }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -39,5 +38,13 @@ class UserViewModel(app: Application) : AndroidViewModel(app) {
 
     fun updateDefeatedEnemies() = viewModelScope.launch {
         repo.addDefeatEnemies()
+    }
+
+    init {
+        viewModelScope.launch {
+            repo.userFlow.collect { dbUser ->
+                _user.value = dbUser
+            }
+        }
     }
 }
