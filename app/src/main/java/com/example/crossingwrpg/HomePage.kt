@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -99,6 +100,15 @@ fun HomePage(userVm: UserViewModel) {
                 .fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+        Image(
+            painter = painterResource(R.drawable.dirtpath),
+            contentDescription = null,
+            modifier = Modifier
+                .offset(x = 0.dp, y = 494.dp)
+                .height(300.dp)
+                .fillMaxWidth(),
+            contentScale = ContentScale.Crop
+        )
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -113,7 +123,7 @@ fun HomePage(userVm: UserViewModel) {
                 contentDescription = "Soldier Sprite",
                 modifier = Modifier
                     .size(500.dp)
-                    .offset(x = 0.dp, y = 180.dp),
+                    .offset(x = 0.dp, y = 140.dp),
                 contentScale = ContentScale.Crop,
                 filterQuality = FilterQuality.None
             )
@@ -156,7 +166,7 @@ fun HomePage(userVm: UserViewModel) {
             fontFamily = pixelFontFamily,
             textAlign = TextAlign.Center,
             fontSize = 30.sp,
-            color = Color.DarkGray,
+            color = Color.LightGray,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(top = 76.dp)
