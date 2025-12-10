@@ -57,8 +57,6 @@ fun CharacterScreen(
     val userVm: UserViewModel = viewModel()
     val user = userVm.userFlow.collectAsState(initial = null).value
 
-    val allItems by inventoryVm.allItems.collectAsState(initial = emptyList())
-
     val lightBrown = Color(0xff915f2f)
     val darkBrown = Color(0xff87573C)
 
@@ -216,8 +214,6 @@ fun CharacterScreen(
         }
     }
 
-    if (enableCustomizationPopup) {
-    }
 }
 
 @Composable
