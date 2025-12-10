@@ -299,7 +299,7 @@ fun BattleScreen(
                         )
 
                         is BattleState.PlayerHeal -> PixelText(
-                            text = "You healed for ${player.mind} HP!"
+                            text = "You healed for 25 HP!"
                         )
 
                         is BattleState.EnemyTurn -> PixelText(
