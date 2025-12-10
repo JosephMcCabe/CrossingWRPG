@@ -159,7 +159,6 @@ fun AppNavigation(
                 HomePage(userVm)
             }
             composable(route = Destination.BATTLE.route) {
-                battleSimulation.resetBattle()
                 BattleScreen(
                     onNavigateToHome = { navController.navigate(Destination.HOME.route) },
                     battleSimulation = battleSimulation,

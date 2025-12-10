@@ -136,6 +136,7 @@ fun BattleScreen(
     DisposableEffect(Unit) {
         onDispose {
             MusicPlayer.free()
+            battleSimulation.resetBattle()
         }
     }
 
