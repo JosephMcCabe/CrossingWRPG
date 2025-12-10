@@ -143,6 +143,8 @@ fun BattleScreen(
     val player by battleSimulation.playerState
     val enemy by battleSimulation.enemyState
     val state by battleSimulation.battleState
+    val lastPlayerDamage by battleSimulation.lastPlayerDamage
+    val lastEnemyDamage by battleSimulation.lastEnemyDamage
 
     val user by userVm.userFlow.collectAsState(initial = null)
 
@@ -277,7 +279,7 @@ fun BattleScreen(
                         )
 
                         is BattleState.PlayerAttack -> PixelText(
-                            text = "You attacked ${enemy.name} for ${player.strength} damage!",
+                            text = "You attacked ${enemy.name} for $lastPlayerDamage damage!",
                         )
 
                         is BattleState.PlayerHeal -> PixelText(
@@ -285,7 +287,7 @@ fun BattleScreen(
                         )
 
                         is BattleState.EnemyTurn -> PixelText(
-                            text = "You are attacked by the ${enemy.name} for ${enemy.strength} damage!",
+                            text = "You are attacked by the ${enemy.name} for $lastEnemyDamage damage!",
                         )
 
                         is BattleState.End -> {
