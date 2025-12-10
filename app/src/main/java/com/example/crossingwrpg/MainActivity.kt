@@ -156,9 +156,10 @@ fun AppNavigation(
             modifier = Modifier.padding(contentPadding)
         ) {
             composable(route = Destination.HOME.route) {
-                HomePage()
+                HomePage(userVm)
             }
             composable(route = Destination.BATTLE.route) {
+                battleSimulation.resetBattle()
                 BattleScreen(
                     onNavigateToHome = { navController.navigate(Destination.HOME.route) },
                     battleSimulation = battleSimulation,

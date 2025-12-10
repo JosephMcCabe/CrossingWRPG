@@ -41,15 +41,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import com.example.crossingwrpg.data.UserViewModel
 
 @Composable
-fun HomePage() {
-    val userVm: UserViewModel = viewModel()
+fun HomePage(userVm: UserViewModel) {
     val needsName by userVm.needsName.collectAsState()
     val user by userVm.userFlow.collectAsState()
 
@@ -70,7 +68,7 @@ fun HomePage() {
         )
     }
 
-    if (needsName == true) {
+    if (needsName) {
         NameDialog(onConfirm = { name -> userVm.saveName(name) })
     }
 
