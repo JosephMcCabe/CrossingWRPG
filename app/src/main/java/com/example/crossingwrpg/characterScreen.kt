@@ -24,6 +24,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,18 +48,44 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
+import com.example.crossingwrpg.data.InventoryViewModel
 import com.example.crossingwrpg.data.UserViewModel
 
-private var customizationName = "Default"
 
 private data class CharacterEquipment(var helmet: Int, var chestplate: Int, var bottoms: Int, var boots: Int, var weaponry: Int)
 
 @Composable
 fun CharacterScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    inventoryVm: InventoryViewModel
 ) {
     val userVm: UserViewModel = viewModel()
     val user = userVm.userFlow.collectAsState(initial = null).value
+
+    val earnedItems by inventoryVm.sessionEarnedItem.collectAsState()
+    val allItems by inventoryVm.allItems.collectAsState(initial = emptyList())
+
+    val totalItemCount = earnedItems.values.sum()
+    val hasEarnedRewards = earnedItems.isNotEmpty()
+
+    var showRewardDialog by remember { mutableStateOf(false) }
+    var showInventoryDialog by remember { mutableStateOf(false) }
+    var displayedEarnedItems by remember { mutableStateOf<Map<Long, Int>>(emptyMap()) }
+
+    LaunchedEffect(showRewardDialog) {
+        if (!showRewardDialog && earnedItems.isNotEmpty()) {
+            inventoryVm.commitEarnedItems()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (earnedItems.isNotEmpty()) {
+                inventoryVm.commitEarnedItems()
+            }
+        }
+    }
+
 
     val lightBrown = Color(0xff915f2f)
     val darkBrown = Color(0xff87573C)
@@ -182,7 +210,6 @@ fun CharacterScreen(
                     .size(73.dp)
                     .offset(x = (-5).dp)
                 .size(75.dp).clickable(onClick = { if (enableCustomizationPopup == false) {
-                    customizationName = "Pants"
                     enableCustomizationPopup = true
                 }
                 else {
@@ -206,7 +233,6 @@ fun CharacterScreen(
                 modifier = Modifier
                     .size(73.dp)
                     .clickable(onClick = { if (enableCustomizationPopup == false) {
-                        customizationName = "Weaponry"
                         enableCustomizationPopup = true
                     }
                     else {
@@ -218,7 +244,6 @@ fun CharacterScreen(
     }
 
     if (enableCustomizationPopup) {
-        CustomizationPopup(customizationName)
     }
 }
 
@@ -250,73 +275,4 @@ fun CustomizationImage(id: Int) {
             .padding(4.dp))
 }
 
-@Composable
-fun CustomizationPopup(titleName: String) {
-    Box(contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxSize()) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.White)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(225.dp, height = 310.dp),
-        ) {
-            Text(
-                text = titleName,
-                textAlign = TextAlign.Center,
-                fontFamily = pixelFontFamily,
-                fontSize = 43.sp,
-                modifier = Modifier
-                    .padding(top = 18.dp)
-                    .align(Alignment.TopCenter)
-            )
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = 95.dp),
-                columns = GridCells.Adaptive(minSize = 73.dp),
-            ) {
-                if (titleName == "Helmets") {
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                }
-                if (titleName == "Chestplates") {
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                }
-
-                if (titleName == "Pants") {
-                    item { CreateCustomizationItem(-1) }
-                }
-
-                if (titleName == "Shoes") {
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                }
-                if (titleName == "Weaponry") {
-                    item { CreateCustomizationItem(0) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                }
-
-            }
-        }
-    }
-}
 

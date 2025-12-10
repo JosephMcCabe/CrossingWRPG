@@ -201,7 +201,10 @@ fun AppNavigation(
                 AchievementsScreenFunction(navController = navController)
             }
             composable(route = Destination.CHARACTER.route) {
-                CharacterScreen(navController = navController)
+                CharacterScreen(
+                    navController = navController,
+                    inventoryVm = inventoryVm
+                )
             }
         }
     }
