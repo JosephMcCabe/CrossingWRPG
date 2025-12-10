@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (screenName == "story_page")
+        if (screenName == "story_page" || screenName == "narrative_page")
             MusicPlayer.play()
     }
 
@@ -201,7 +201,10 @@ fun AppNavigation(
                 AchievementsScreenFunction(navController = navController)
             }
             composable(route = Destination.CHARACTER.route) {
-                CharacterScreen(navController = navController)
+                CharacterScreen(
+                    navController = navController,
+                    inventoryVm = inventoryVm
+                )
             }
         }
     }
