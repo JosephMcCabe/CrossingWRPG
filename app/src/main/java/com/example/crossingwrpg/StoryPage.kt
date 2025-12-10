@@ -3,6 +3,7 @@ package com.example.crossingwrpg
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -165,6 +166,11 @@ fun BattleScreen(
     fun nextTurn() {
         battleSimulation.advanceBattle()
     }
+    val Tan = Color(0xFFD2B48C)
+    Box(
+        modifier = Modifier
+            .fillMaxSize().background(Tan)
+    )
 
     val isEnemyDead = enemy.currentHealth <= 0
 
@@ -242,12 +248,18 @@ fun BattleScreen(
             )
 
             Spacer(Modifier.height(10.dp))
+            val TransparentDarkBrown = Color(0x805C4033).copy(alpha = 0.8f)
 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
                     .padding(vertical = 8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = TransparentDarkBrown,
+                    contentColor = Color.White
+                ),
+
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             ) {
                 Column(
