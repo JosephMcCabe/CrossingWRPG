@@ -9,6 +9,7 @@ import androidx.core.net.toUri
 
 object MusicPlayer {
     private var player: ExoPlayer? = null
+    private var playerPosition: Long? = null
 
     fun preparePlayer(context: Context) {
         if (player == null) {
@@ -19,11 +20,15 @@ object MusicPlayer {
 
     fun changeSong(songName: String) {
         if (songName.toUri() != player?.currentMediaItem) {
-            val victory1Uri = ("android.resource://com.example.crossingwrpg/raw/$songName").toUri()
-            val mediaItem = MediaItem.fromUri(victory1Uri)
+            val songUri = ("android.resource://com.example.crossingwrpg/raw/$songName").toUri()
+            val mediaItem = MediaItem.fromUri(songUri)
             player?.setMediaItem(mediaItem)
             player?.prepare()
         }
+    }
+
+    fun seek(seconds: Double) {
+        player?.seekTo((seconds * 1000).toLong())
     }
 
     fun play() {

@@ -1,6 +1,6 @@
 package com.example.crossingwrpg.com.example.crossingwrpg
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,47 +16,51 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.crossingwrpg.AchievementTracker
 import com.example.crossingwrpg.MusicPlayer
+import com.example.crossingwrpg.R
+import com.example.crossingwrpg.data.UserViewModel
 import com.example.crossingwrpg.pixelFontFamily
 
 
-private var achievementsCompleted = 0
 @Composable
 fun AchievementsScreenFunction(navController: NavHostController) {
+    val context = LocalContext.current
+    val achievementTracker = remember { AchievementTracker(context) }
 
-    val userVm: com.example.crossingwrpg.data.UserViewModel = viewModel()
+    val userVm: UserViewModel = viewModel()
     val user = userVm.userFlow.collectAsState(initial = null).value
 
     val userSteps = user?.totalSteps ?: 0
     val totalEnemiesDefeat = user?.enemiesDefeated ?: 0
     val userTime = user?.totalWalkingSeconds ?: 0
 
-    achievementsCompleted = 0
-
+    val completedCount = achievementTracker.getCompletedCount()
 
     MusicPlayer.pause()
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)
-    )
     Box(
-        contentAlignment = Alignment.TopCenter,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 35.dp)
-            .padding(16.dp)
-            .background(Color.White)
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
     )
-    {
+    {   Image(
+        painter = painterResource(R.drawable.scroll_background),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
         Row {
             Icon(
                 imageVector = Icons.Default.EmojiEvents,
@@ -71,55 +75,67 @@ fun AchievementsScreenFunction(navController: NavHostController) {
                 modifier = Modifier
             )
         }
+
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 70.dp)
-                .background(Color.White)
         )
         {
             item {
                 AchievementCard(
                     achievementName = "A New Beginning",
                     achievementDescription = "Walk 1,000 steps",
-                    achievementProgress = userSteps / 1000.0
+                    achievementProgress = userSteps / 1000.0,
+                    completed = achievementTracker.isCompleted("steps_1000")
                 )}
             item{
                 AchievementCard(
                     achievementName = "Making Progress",
                     achievementDescription = "Walk 10,000 Steps",
-                    achievementProgress = userSteps / 10000.0
+                    achievementProgress = userSteps / 10000.0,
+                    completed = achievementTracker.isCompleted("steps_10000")
                 )}
             item{
                 AchievementCard(
                     achievementName = "True Walker",
                     achievementDescription = "Walk 100,000 Steps",
-                    achievementProgress = userSteps / 100000.0
+                    achievementProgress = userSteps / 100000.0,
+                    completed = achievementTracker.isCompleted("steps_100000")
                 )}
             item{
                 AchievementCard(
                     achievementName = "New Slayer",
                     achievementDescription = "Defeat 5 Enemies",
-                    achievementProgress = totalEnemiesDefeat / 5.0
+                    achievementProgress = totalEnemiesDefeat / 5.0,
+                    completed = achievementTracker.isCompleted("enemies_5")
                 )}
             item{
                 AchievementCard(
                     achievementName = "Dungeon Crawler",
                     achievementDescription = "Defeat 25 enemies",
-                    achievementProgress = totalEnemiesDefeat / 25.0
+                    achievementProgress = totalEnemiesDefeat / 25.0,
+                    completed = achievementTracker.isCompleted("enemies_25")
                 )}
             item{
                 AchievementCard(
                     achievementName = "Be Right Back",
                     achievementDescription = "Walk for a total of 30 minutes",
-                    achievementProgress = userTime / (30.0 * 60.0)
+                    achievementProgress = userTime / (30.0 * 60.0),
+                    completed = achievementTracker.isCompleted("time_30min")
                 )}
             item{
+                val secretUnlocked = completedCount >= 6
                 AchievementCard(
-                    achievementName = "???",
-                    achievementDescription = "Unlock more achievements to unlock",
-                    achievementProgress = 0.0 / 1.0
+                    achievementName = if (secretUnlocked) "Walking Hero" else "???",
+                    achievementDescription = if (secretUnlocked) {
+                        "Unlock all achievements in Crossing: A Walking RPG"
+                    } else {
+                        "Unlock secret achievement"
+                    },
+                    achievementProgress = completedCount / 6.0,
+                    completed = completedCount >= 6
                 )}
         }
     }
@@ -131,44 +147,36 @@ fun AchievementCard(
     achievementName: String,
     achievementDescription: String,
     achievementProgress: Double,
+    completed: Boolean
 ) {
-    // Set Achievement progress bar to accurately show progress to
-    var achievementPercentCompleted = achievementProgress
-    achievementPercentCompleted = (achievementPercentCompleted * 100) * 2.75
-
-    var localName = achievementName
-    var localDescription = achievementDescription
-
-    if (achievementDescription == "Unlock more achievements to unlock" && achievementsCompleted >= 6) {
-        localName = "Walking Hero"
-        localDescription = "Unlock all achievements in Crossing: A Walking RPG"
-        achievementPercentCompleted= 275.0
+    var achievementPercentCompleted = (achievementProgress * 100) * 2.75
+    if (completed) {
+        achievementPercentCompleted = 275.0
     }
-
-    val isCompleted = achievementPercentCompleted >= 275.0
-
+    val tanColor = Color(0xFFD2B48C)
     ElevatedCard(
         modifier = Modifier
             .padding(bottom = 15.dp)
-            .width(300.dp)
+            .width(300.dp),
+            colors = androidx.compose.material3.CardDefaults.elevatedCardColors(containerColor = tanColor)
     ) {
         Icon(
             imageVector = Icons.Default.EmojiEvents,
             contentDescription = "Trophy Image",
-            tint = if (isCompleted) Color(0xFFDAA520) else Color.DarkGray
+            tint = if (completed) Color(0xFFDAA520) else Color.DarkGray
         )
-            Text(
-                text = " $localName ",
-                fontFamily = pixelFontFamily,
-                fontSize = 35.sp,
-                color = Color.DarkGray,
-                modifier = Modifier
-            )
         Text(
-            text = " $localDescription ",
+            text = " $achievementName ",
+            fontFamily = pixelFontFamily,
+            fontSize = 35.sp,
+            color = Color.DarkGray,
+            modifier = Modifier
+        )
+        Text(
+            text = " $achievementDescription ",
             fontFamily = pixelFontFamily,
             fontSize = 25.sp,
-            color = if (isCompleted) Color.Gray else Color.DarkGray,
+            color = if (completed) Color.Gray else Color.DarkGray,
             modifier = Modifier
         )
         if (achievementPercentCompleted < 275.0) {
@@ -180,9 +188,7 @@ fun AchievementCard(
                     .width(achievementPercentCompleted.dp)
 
             )
-        }
-        else {
-            achievementsCompleted++
+        } else {
             Text(
                 text = " Completed! ",
                 fontFamily = pixelFontFamily,

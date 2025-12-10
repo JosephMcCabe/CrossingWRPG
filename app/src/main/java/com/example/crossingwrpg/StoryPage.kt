@@ -3,6 +3,8 @@ package com.example.crossingwrpg
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +16,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -28,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -40,6 +46,7 @@ import coil.decode.ImageDecoderDecoder
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.request.repeatCount
 
 sealed class BattleState {
     object Start : BattleState()
@@ -79,26 +86,41 @@ fun CharacterHealthBar(
     }
     val trackColor = Color.Gray.copy(alpha = 0.3f)
 
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Card(
+        modifier = Modifier
+            .height(80.dp)
+            .width(600.dp)
+            .border(0.5.dp, Color.Transparent, RoundedCornerShape(12.dp)),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isPlayer) Color.White.copy(alpha = 0.2f) else Color.Black.copy(alpha = 0.2f)
+        )
     ) {
-        Text(
-            text = "${character.name}: ${character.currentHealth.coerceAtLeast(0)}/${character.maxHealth} HP",
-            fontFamily = pixelFontFamily,
-            fontSize = 30.sp,
-        )
-        Spacer(Modifier.height(4.dp))
+        Column(
+            modifier = modifier
+                .fillMaxHeight()
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "${character.name}: ${character.currentHealth.coerceAtLeast(0)}/${character.maxHealth} HP",
+                fontFamily = pixelFontFamily,
+                fontSize = 30.sp,
+                color = if (isPlayer) Color.Black else Color.White
+            )
+            Spacer(Modifier.height(10.dp))
 
-        LinearProgressIndicator(
-            progress = { animatedProgress },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(10.dp),
-            color = healthBarColor,
-            trackColor = trackColor,
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-        )
+            LinearProgressIndicator(
+                progress = { animatedProgress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
+                    .height(12.dp),
+                color = healthBarColor,
+                trackColor = trackColor,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+            )
+        }
     }
 }
 
@@ -113,11 +135,18 @@ fun BattleScreen(
     inventoryVm: InventoryViewModel
 ) {
 
-    MusicPlayer.play()
+    DisposableEffect(Unit) {
+        onDispose {
+            MusicPlayer.free()
+            battleSimulation.resetBattle()
+        }
+    }
 
     val player by battleSimulation.playerState
     val enemy by battleSimulation.enemyState
     val state by battleSimulation.battleState
+    val lastPlayerDamage by battleSimulation.lastPlayerDamage
+    val lastEnemyDamage by battleSimulation.lastEnemyDamage
 
     val user by userVm.userFlow.collectAsState(initial = null)
 
@@ -137,29 +166,36 @@ fun BattleScreen(
     fun nextTurn() {
         battleSimulation.advanceBattle()
     }
+    val Tan = Color(0xFFD2B48C)
+    Box(
+        modifier = Modifier
+            .fillMaxSize().background(Tan)
+    )
+
+    val isEnemyDead = enemy.currentHealth <= 0
 
     Image(
         painter = painterResource(R.drawable.background_layer_1),
         contentDescription = null,
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.5f),
+            .requiredHeight(450.dp)
+            .fillMaxSize(),
         contentScale = ContentScale.Crop
     )
     Image(
         painter = painterResource(R.drawable.background_layer_2),
         contentDescription = null,
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.5f),
+            .requiredHeight(450.dp)
+            .fillMaxSize(),
         contentScale = ContentScale.Crop
     )
     Image(
         painter = painterResource(R.drawable.background_layer_3),
         contentDescription = null,
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.5f),
+            .requiredHeight(450.dp)
+            .fillMaxSize(),
         contentScale = ContentScale.Crop
     )
 
@@ -187,21 +223,22 @@ fun BattleScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(2f)
-                    .padding(vertical = 8.dp),
+                    .weight(2.5f)
+                    .padding(vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(R.drawable.pixelgoblin)
+                        .data(if (isEnemyDead) R.drawable.goblin_death else R.drawable.pixelgoblin)
                         .decoderFactory(ImageDecoderDecoder.Factory())
+                        .repeatCount(if (isEnemyDead) 0 else -1)
                         .build(),
-                    contentDescription = "Goblin Image",
+                    contentDescription = if (isEnemyDead) "Goblin Dead" else "Goblin Image",
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    contentScale = ContentScale.Crop,
+                        .offset(x = 20.dp, y = 90.dp)
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Fit,
                     filterQuality = FilterQuality.High
                 )
             }
@@ -211,12 +248,18 @@ fun BattleScreen(
             )
 
             Spacer(Modifier.height(10.dp))
+            val TransparentDarkBrown = Color(0x805C4033).copy(alpha = 0.8f)
 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
                     .padding(vertical = 8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = TransparentDarkBrown,
+                    contentColor = Color.White
+                ),
+
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             ) {
                 Column(
@@ -236,29 +279,31 @@ fun BattleScreen(
                             battleWon = false
                             MusicPlayer.preparePlayer(context)
                             MusicPlayer.changeSong("xdeviruchidecisivebattle")
-                            MusicPlayer.play()
                             MusicPlayer.loop()
 
                         }
 
-                        is BattleState.Intro -> PixelText(
-                            text = "You are attacked by a ${enemy.name}!"
-                        )
+                        is BattleState.Intro -> {
+                            MusicPlayer.play()
+                            PixelText(
+                                text = "You are attacked by a ${enemy.name}!"
+                            )
+                        }
 
                         is BattleState.PlayerTurn -> PixelText(
                             text = "Your turn!"
                         )
 
                         is BattleState.PlayerAttack -> PixelText(
-                            text = "You attacked ${enemy.name} for ${player.strength} damage!",
+                            text = "You attacked ${enemy.name} for $lastPlayerDamage damage!",
                         )
 
                         is BattleState.PlayerHeal -> PixelText(
-                            text = "You healed for ${player.mind} HP!"
+                            text = "You healed for 25 HP!"
                         )
 
                         is BattleState.EnemyTurn -> PixelText(
-                            text = "You are attacked by the ${enemy.name} for ${enemy.strength} damage!",
+                            text = "You are attacked by the ${enemy.name} for $lastEnemyDamage damage!",
                         )
 
                         is BattleState.End -> {
@@ -365,9 +410,8 @@ fun BattleScreen(
 
                         Button(
                             onClick = {
-                                battleSimulation.resetBattle()
+                                MusicPlayer.pause()
                                 onNavigateToHome()
-                                MusicPlayer.free()
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Black,

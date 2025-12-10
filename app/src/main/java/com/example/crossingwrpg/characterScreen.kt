@@ -1,5 +1,6 @@
 package com.example.crossingwrpg
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,12 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,13 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,32 +43,74 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
+import com.example.crossingwrpg.data.InventoryViewModel
 import com.example.crossingwrpg.data.UserViewModel
 
-private var customizationName = "Default"
 
-private data class characterEquip(var helmet: Int, var chestplate: Int, var bottoms: Int, var boots: Int, var weaponry: Int)
+private data class EquippedEquipment(var rune: Int, var weaponry: Int)
 
 @Composable
 fun CharacterScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    inventoryVm: InventoryViewModel
 ) {
     val userVm: UserViewModel = viewModel()
     val user = userVm.userFlow.collectAsState(initial = null).value
 
-    MusicPlayer.pause()
+    val lightBrown = Color(0xff915f2f)
+    val darkBrown = Color(0xff87573C)
+    val TransparentDarkBrown = Color(0x805C4033).copy(alpha = 0.8f)
 
+    MusicPlayer.pause()
+    Column(
+        modifier = Modifier
+            .offset(y = 0.dp)
+            .height(525.dp)
+            .width(550.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
     Box(
+        contentAlignment = Alignment.CenterStart,
         modifier = Modifier
             .fillMaxSize()
     ) {
         Image(
             painter = painterResource(R.drawable.forestbackground),
             contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .align(Alignment.TopCenter),
             contentScale = ContentScale.Crop
         )
+        }
     }
+
+    Box(
+        contentAlignment = Alignment.CenterStart,
+        modifier = Modifier
+            .offset(y = 525.dp)
+            .height(265.dp)
+            .background(lightBrown)
+    ) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .border(BorderStroke(19.dp, darkBrown), RectangleShape)
+        )
+
+        LazyVerticalGrid(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(23.dp),
+            columns = GridCells.Adaptive(minSize = 65.dp),
+        ) {
+            item { CreateCustomizationItemSlot(0) }
+            item { CreateCustomizationItemSlot(-1) }
+            item { CreateCustomizationItemSlot(-1) }
+            item { CreateCustomizationItemSlot(-1) }
+
+        }
+    }
+
 
     Column(
         modifier = Modifier
@@ -81,9 +123,10 @@ fun CharacterScreen(
                 .fillMaxWidth()
                 .padding(16.dp)
                 .height(IntrinsicSize.Min)
-                .border(3.dp, Color.Green, RoundedCornerShape(12.dp)),
+                .border(3.dp, darkBrown, RoundedCornerShape(12.dp)),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = TransparentDarkBrown,
+                contentColor = Color.White
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
@@ -93,7 +136,7 @@ fun CharacterScreen(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
-                PixelText("Character", fontSize = 42.sp)
+                PixelText("Character", fontSize = 80.sp)
                 Spacer(
                     Modifier.height(16.dp)
                 )
@@ -115,7 +158,7 @@ fun CharacterScreen(
             contentDescription = "Goblin Image",
             modifier = Modifier
                 .size(180.dp)
-                .offset(y = 230.dp),
+                .offset(y = 15.dp),
             contentScale = ContentScale.Fit,
             filterQuality = FilterQuality.None
         )
@@ -126,108 +169,62 @@ fun CharacterScreen(
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .offset(15.dp, 105.dp),
-        contentAlignment = Alignment.CenterStart
+        .offset((-102).dp, 25.dp),
+        contentAlignment = Alignment.Center
     ) {
         Column (
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(75.dp)
-                .clickable(onClick = { if (enableCustomizationPopup == false) {
-                    customizationName = "Helmets"
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
-            )
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(75.dp).clickable(onClick = { if (enableCustomizationPopup == false) {
-                    customizationName = "Chestplates"
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
-            )
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(75.dp).clickable(onClick = { if (enableCustomizationPopup == false) {
-                    customizationName = "Pants"
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
-            )
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(75.dp)
-                .clickable(onClick = { if (enableCustomizationPopup == false) {
-                    customizationName = "Shoes"
-
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
-            ) {
-
-            }
+            Image(
+                painter = painterResource(R.drawable.customizable_effect),
+                contentDescription = "",
+                modifier = Modifier
+                    .size(73.dp)
+                    .offset(x = (-5).dp)
+                    .size(75.dp)
+                    .clickable(onClick = { if (enableCustomizationPopup == false) {
+                        enableCustomizationPopup = true
+                    }
+                    else {
+                        enableCustomizationPopup = false
+                    }
+                    })
+                )
+           }
         }
-    }
     Box(modifier = Modifier
         .fillMaxSize()
-        .offset(-15.dp, 95.dp),
-        contentAlignment = Alignment.CenterEnd
+        .offset(102.dp, 25.dp),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(30.dp)
         ) {
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.LightGray)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(75.dp)
-                .clickable(onClick = { if (enableCustomizationPopup == false) {
-                    customizationName = "Weaponry"
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
+            Image(
+                painter = painterResource(R.drawable.customizable_weaponry),
+                contentDescription = "",
+                modifier = Modifier
+                    .size(73.dp)
+                    .clickable(onClick = { if (enableCustomizationPopup == false) {
+                        enableCustomizationPopup = true
+                    }
+                    else {
+                        enableCustomizationPopup = false
+                    }
+                    })
             )
         }
     }
 
-    if (enableCustomizationPopup) {
-        CustomizationPopup(customizationName)
-    }
 }
 
 @Composable
-fun CreateCustomizationItem(id: Int) {
-    Box(modifier = Modifier
-        .clip(RoundedCornerShape(12.dp))
-        .background(Color.LightGray)
-        .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-        .size(75.dp)
+fun CreateCustomizationItemSlot(id: Int) {
+    Image(
+        painter = painterResource(R.drawable.customizable_slot),
+        contentDescription = "",
+        modifier = Modifier
+            .size(73.dp)
     )
     if (id >= 0) {
         val drawable = when (id) {
@@ -242,79 +239,11 @@ fun CreateCustomizationItem(id: Int) {
 fun CustomizationImage(id: Int) {
     Image(
         painter = painterResource(id),
-        contentDescription = "test",
+        contentDescription = "",
         modifier = Modifier
             .size(64.dp)
+            .offset(y = 5.dp)
             .padding(4.dp))
 }
 
-@Composable
-fun CustomizationPopup(titleName: String) {
-    Box(contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxSize()) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.White)
-                .border(5.dp, Color.Black, RoundedCornerShape(12.dp))
-                .size(225.dp, height = 310.dp),
-        ) {
-            Text(
-                text = titleName,
-                textAlign = TextAlign.Center,
-                fontFamily = pixelFontFamily,
-                fontSize = 43.sp,
-                modifier = Modifier
-                    .padding(top = 18.dp)
-                    .align(Alignment.TopCenter)
-            )
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = 95.dp),
-                columns = GridCells.Adaptive(minSize = 75.dp),
-            ) {
-                if (titleName == "Helmets") {
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                }
-                if (titleName == "Chestplates") {
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                }
-
-                if (titleName == "Pants") {
-                    item { CreateCustomizationItem(-1) }
-                }
-
-                if (titleName == "Shoes") {
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                }
-                if (titleName == "Weaponry") {
-                    item { CreateCustomizationItem(0) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                    item { CreateCustomizationItem(-1) }
-                }
-
-            }
-        }
-    }
-}
 

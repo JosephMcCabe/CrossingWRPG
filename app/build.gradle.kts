@@ -74,7 +74,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    implementation("com.google.maps.android:maps-compose:6.12.0")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.play.services.maps)
