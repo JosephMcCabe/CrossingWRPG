@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -132,7 +133,12 @@ fun BattleScreen(
     inventoryVm: InventoryViewModel
 ) {
 
-    MusicPlayer.play()
+    DisposableEffect(Unit) {
+        onDispose {
+            MusicPlayer.free()
+            battleSimulation.resetBattle()
+        }
+    }
 
     val player by battleSimulation.playerState
     val enemy by battleSimulation.enemyState
@@ -255,14 +261,16 @@ fun BattleScreen(
                             battleWon = false
                             MusicPlayer.preparePlayer(context)
                             MusicPlayer.changeSong("xdeviruchidecisivebattle")
-                            MusicPlayer.play()
                             MusicPlayer.loop()
 
                         }
 
-                        is BattleState.Intro -> PixelText(
-                            text = "You are attacked by a ${enemy.name}!"
-                        )
+                        is BattleState.Intro -> {
+                            MusicPlayer.play()
+                            PixelText(
+                                text = "You are attacked by a ${enemy.name}!"
+                            )
+                        }
 
                         is BattleState.PlayerTurn -> PixelText(
                             text = "Your turn!"
@@ -384,9 +392,8 @@ fun BattleScreen(
 
                         Button(
                             onClick = {
-                                battleSimulation.resetBattle()
+                                MusicPlayer.pause()
                                 onNavigateToHome()
-                                MusicPlayer.free()
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Black,
