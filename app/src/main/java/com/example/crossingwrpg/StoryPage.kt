@@ -46,6 +46,7 @@ import coil.decode.ImageDecoderDecoder
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.request.repeatCount
 
 sealed class BattleState {
     object Start : BattleState()
@@ -171,6 +172,8 @@ fun BattleScreen(
             .fillMaxSize().background(Tan)
     )
 
+    val isEnemyDead = enemy.currentHealth <= 0
+
     Image(
         painter = painterResource(R.drawable.background_layer_1),
         contentDescription = null,
@@ -227,10 +230,11 @@ fun BattleScreen(
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(R.drawable.pixelgoblin)
+                        .data(if (isEnemyDead) R.drawable.goblin_death else R.drawable.pixelgoblin)
                         .decoderFactory(ImageDecoderDecoder.Factory())
+                        .repeatCount(if (isEnemyDead) 0 else -1)
                         .build(),
-                    contentDescription = "Goblin Image",
+                    contentDescription = if (isEnemyDead) "Goblin Dead" else "Goblin Image",
                     modifier = Modifier
                         .offset(x = 20.dp, y = 90.dp)
                         .fillMaxSize(),
