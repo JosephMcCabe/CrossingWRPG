@@ -12,6 +12,11 @@ class BattleSimulation {
     var battleState: MutableState<BattleState> = mutableStateOf(BattleState.Start)
         private set
 
+    var lastPlayerDamage: MutableState<Int> = mutableStateOf(0)
+        private set
+    var lastEnemyDamage: MutableState<Int> = mutableStateOf(0)
+        private set
+
     private val player: Character get() = playerState.value
     private val enemy: Character get() = enemyState.value
 
@@ -50,6 +55,9 @@ class BattleSimulation {
         )
     }
 
+    private fun randomDamage(base: Int): Int {
+        return base + (0..10).random()
+    }
     fun advanceBattle() {
         when (battleState.value) {
             is BattleState.Start -> battleState.value = BattleState.Intro
@@ -80,11 +88,13 @@ class BattleSimulation {
     }
 
     fun playerAttack() {
-        enemyState.value = enemy.copy(currentHealth = enemy.currentHealth - player.strength)
+        val damage = randomDamage(player.strength)
+        lastPlayerDamage.value = damage
+        enemyState.value = enemy.copy(currentHealth = enemy.currentHealth - damage)
     }
 
     fun playerHeal() {
-        var newHealth = player.currentHealth + player.mind
+        var newHealth = player.currentHealth + 25
         if (newHealth > player.maxHealth) {
             newHealth = player.maxHealth
         }
@@ -92,7 +102,9 @@ class BattleSimulation {
     }
 
     fun enemyAttack() {
-        playerState.value = player.copy(currentHealth = player.currentHealth - enemy.strength)
+        val damage = randomDamage(enemy.strength)
+        lastEnemyDamage.value = damage
+        playerState.value = player.copy(currentHealth = player.currentHealth - damage)
     }
 
     fun checkForWinOrNext(nextState: BattleState): BattleState {

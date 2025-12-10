@@ -195,6 +195,13 @@ fun MapsWithPedometerScreen(
             speedPxPerSec = 60f
         )
 
+        ScrollingGround(
+            isScrolling = walkState == WalkingState.Walking,
+            image = R.drawable.forest_floor_map,
+            speedPxPerSec = 60f,
+            modifier = Modifier
+        )
+
         val showSoldier = walkState == WalkingState.Walking
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -207,9 +214,9 @@ fun MapsWithPedometerScreen(
                 .build(),
             contentDescription = "soldier Image",
             modifier = Modifier
-                .size(180.dp)
+                .size(500.dp)
                 .align(Alignment.Center)
-                .offset(y = -20.dp),
+                .offset(y = 100.dp),
             contentScale = ContentScale.Fit,
             filterQuality = FilterQuality.None
         )
@@ -221,7 +228,7 @@ fun MapsWithPedometerScreen(
                 .fillMaxWidth()
                 .padding(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                Color(0xFFD2B48C)
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
@@ -391,7 +398,7 @@ private fun ScrollingBackground(
     isScrolling: Boolean,
     image: Int,
     speedPxPerSec: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val density = LocalDensity.current
@@ -420,7 +427,7 @@ private fun ScrollingBackground(
             painter = painterResource(image),
             contentDescription = null,
             modifier = Modifier
-                .height(maxHeight / 2)
+                .height(600.dp)
                 .width(widthDp)
                 .offset { IntOffset(firstX, 0) },
             contentScale = ContentScale.FillBounds
@@ -429,9 +436,60 @@ private fun ScrollingBackground(
             painter = painterResource(image),
             contentDescription = null,
             modifier = Modifier
-                .height(maxHeight / 2)
+                .height(600.dp)
                 .width(widthDp)
                 .offset { IntOffset(secondX, 0) },
+            contentScale = ContentScale.FillBounds
+        )
+    }
+}
+
+@Composable
+private fun ScrollingGround(
+    isScrolling: Boolean,
+    image: Int,
+    speedPxPerSec: Float,
+    modifier: Modifier = Modifier,
+) {
+    val imageOff = 1310
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val density = LocalDensity.current
+        val widthPx = with(density) { maxWidth.toPx() }
+        val anim = remember { Animatable(0f) }
+
+        LaunchedEffect(isScrolling, widthPx, speedPxPerSec) {
+            if (!isScrolling || widthPx <= 0f || speedPxPerSec <= 0f) return@LaunchedEffect
+
+            while (isActive) {
+                val duration = ((widthPx / speedPxPerSec) * 1000f).toInt().coerceAtLeast(1)
+                anim.snapTo(0f)
+                anim.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(durationMillis = duration, easing = LinearEasing)
+                )
+            }
+        }
+
+        val offset = -(anim.value * widthPx)
+        val firstX = offset.roundToInt()
+        val secondX = (offset + widthPx).roundToInt()
+
+        Image(
+            painter = painterResource(image),
+            contentDescription = null,
+            modifier = Modifier
+                .height(2000.dp)
+                .fillMaxWidth()
+                .offset { IntOffset(firstX, imageOff) },
+            contentScale = ContentScale.FillBounds
+        )
+        Image(
+            painter = painterResource(image),
+            contentDescription = null,
+            modifier = Modifier
+                .height(2000.dp)
+                .fillMaxWidth()
+                .offset { IntOffset(secondX, imageOff) },
             contentScale = ContentScale.FillBounds
         )
     }
