@@ -22,10 +22,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,14 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -52,7 +47,7 @@ import com.example.crossingwrpg.data.InventoryViewModel
 import com.example.crossingwrpg.data.UserViewModel
 
 
-private data class CharacterEquipment(var helmet: Int, var chestplate: Int, var bottoms: Int, var boots: Int, var weaponry: Int)
+private data class EquippedEquipment(var rune: Int, var weaponry: Int)
 
 @Composable
 fun CharacterScreen(
@@ -62,30 +57,7 @@ fun CharacterScreen(
     val userVm: UserViewModel = viewModel()
     val user = userVm.userFlow.collectAsState(initial = null).value
 
-    val earnedItems by inventoryVm.sessionEarnedItem.collectAsState()
     val allItems by inventoryVm.allItems.collectAsState(initial = emptyList())
-
-    val totalItemCount = earnedItems.values.sum()
-    val hasEarnedRewards = earnedItems.isNotEmpty()
-
-    var showRewardDialog by remember { mutableStateOf(false) }
-    var showInventoryDialog by remember { mutableStateOf(false) }
-    var displayedEarnedItems by remember { mutableStateOf<Map<Long, Int>>(emptyMap()) }
-
-    LaunchedEffect(showRewardDialog) {
-        if (!showRewardDialog && earnedItems.isNotEmpty()) {
-            inventoryVm.commitEarnedItems()
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            if (earnedItems.isNotEmpty()) {
-                inventoryVm.commitEarnedItems()
-            }
-        }
-    }
-
 
     val lightBrown = Color(0xff915f2f)
     val darkBrown = Color(0xff87573C)
@@ -132,10 +104,10 @@ fun CharacterScreen(
                 .padding(23.dp),
             columns = GridCells.Adaptive(minSize = 65.dp),
         ) {
-            item { CreateCustomizationItem(0) }
-            item { CreateCustomizationItem(-1) }
-            item { CreateCustomizationItem(-1) }
-            item { CreateCustomizationItem(2) }
+            item { CreateCustomizationItemSlot(0) }
+            item { CreateCustomizationItemSlot(-1) }
+            item { CreateCustomizationItemSlot(-1) }
+            item { CreateCustomizationItemSlot(-1) }
 
         }
     }
@@ -209,14 +181,15 @@ fun CharacterScreen(
                 modifier = Modifier
                     .size(73.dp)
                     .offset(x = (-5).dp)
-                .size(75.dp).clickable(onClick = { if (enableCustomizationPopup == false) {
-                    enableCustomizationPopup = true
-                }
-                else {
-                    enableCustomizationPopup = false
-                }
-                })
-            )
+                    .size(75.dp)
+                    .clickable(onClick = { if (enableCustomizationPopup == false) {
+                        enableCustomizationPopup = true
+                    }
+                    else {
+                        enableCustomizationPopup = false
+                    }
+                    })
+                )
            }
         }
     Box(modifier = Modifier
@@ -248,7 +221,7 @@ fun CharacterScreen(
 }
 
 @Composable
-fun CreateCustomizationItem(id: Int) {
+fun CreateCustomizationItemSlot(id: Int) {
     Image(
         painter = painterResource(R.drawable.customizable_slot),
         contentDescription = "",
