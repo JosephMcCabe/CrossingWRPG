@@ -175,37 +175,6 @@ fun CharacterScreen(
         Column (
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-           //Image(
-           //    painter = painterResource(R.drawable.customizable_helmet),
-           //    contentDescription = "",
-           //    modifier = Modifier
-           //        .size(73.dp)
-           //        .offset(x = (-5).dp)
-           //        .clickable(onClick = { if (enableCustomizationPopup == false) {
-           //            customizationName = "Helmets"
-           //            enableCustomizationPopup = true
-           //        }
-           //        else {
-           //            enableCustomizationPopup = false
-           //        }
-           //        })
-           //    )
-           //Image(
-           //    painter = painterResource(R.drawable.customizable_chestplate),
-           //    contentDescription = "",
-           //    modifier = Modifier
-           //        .size(73.dp)
-           //        .offset(x = (-5).dp)
-           //        .clickable(onClick = {
-           //            if (enableCustomizationPopup == false) {
-           //        customizationName = "Chestplates"
-           //        enableCustomizationPopup = true
-           //    }
-           //    else {
-           //        enableCustomizationPopup = false
-           //    }
-           //    })
-           //)
             Image(
                 painter = painterResource(R.drawable.customizable_effect),
                 contentDescription = "",
@@ -221,21 +190,6 @@ fun CharacterScreen(
                 }
                 })
             )
-           //Image(
-           //    painter = painterResource(R.drawable.customizable_shoe),
-           //    contentDescription = "",
-           //    modifier = Modifier
-           //        .size(73.dp)
-           //        .offset(x = (-5).dp)
-           //        .clickable(onClick = { if (enableCustomizationPopup == false) {
-           //            customizationName = "Shoes"
-
-           //            enableCustomizationPopup = true
-           //        }
-           //        else {
-           //            enableCustomizationPopup = false
-           //        }
-           //        }))
            }
         }
     Box(modifier = Modifier
