@@ -17,6 +17,7 @@ import com.example.crossingwrpg.R.drawable.pixelpotion
 class Notifications(private val context: Context) {
     private val levelUpChannelId = "level_up_channel"
     private val itemDropChannelId = "item_drop_channel"
+    private val achievementChannelId = "achievement_channel"
 
     private val mainActivityPendingIntent: PendingIntent by lazy {
         val mainActivityIntent = Intent(context, MainActivity::class.java).apply {
@@ -34,10 +35,14 @@ class Notifications(private val context: Context) {
             val itemDropChannel = NotificationChannel(
                 itemDropChannelId, "Item Drops", NotificationManager.IMPORTANCE_HIGH
             )
+            val achievementChannel = NotificationChannel(
+                achievementChannelId, "Achievement Completion", NotificationManager.IMPORTANCE_HIGH
+            )
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(levelUpChannel)
             notificationManager.createNotificationChannel(itemDropChannel)
+            notificationManager.createNotificationChannel(achievementChannel)
         }
     }
 
@@ -81,5 +86,26 @@ class Notifications(private val context: Context) {
         if (permissionNotGranted) return
 
         NotificationManagerCompat.from(context).notify(2001, itemDropNotification)
+    }
+
+    fun showAchievementNotification(title: String, message: String) {
+        val achievementNotification = NotificationCompat.Builder(context, achievementChannelId)
+            .setSmallIcon(pixelpotion)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setAutoCancel(true)
+            .setContentIntent(mainActivityPendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
+
+        val permissionNotGranted =
+            Build.VERSION.SDK_INT >= 33 &&
+                    ActivityCompat.checkSelfPermission(
+                        context, Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+
+        if (permissionNotGranted) return
+
+        NotificationManagerCompat.from(context).notify(3001, achievementNotification)
     }
 }

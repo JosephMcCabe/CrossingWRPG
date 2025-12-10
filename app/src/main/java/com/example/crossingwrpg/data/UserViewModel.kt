@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class UserViewModel(app: Application) : AndroidViewModel(app) {
     private val repo by lazy {
         val db = AppDatabase.getDatabase(app)
-        UserRepository(db.userDao())
+        UserRepository(db.userDao(), app.applicationContext)
     }
 
     private val _user = MutableStateFlow<User?>(null)
