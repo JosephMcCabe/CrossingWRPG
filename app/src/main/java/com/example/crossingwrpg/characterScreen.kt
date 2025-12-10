@@ -59,6 +59,7 @@ fun CharacterScreen(
 
     val lightBrown = Color(0xff915f2f)
     val darkBrown = Color(0xff87573C)
+    val TransparentDarkBrown = Color(0x805C4033).copy(alpha = 0.8f)
 
     MusicPlayer.pause()
     Column(
@@ -122,9 +123,10 @@ fun CharacterScreen(
                 .fillMaxWidth()
                 .padding(16.dp)
                 .height(IntrinsicSize.Min)
-                .border(3.dp, Color.Yellow, RoundedCornerShape(12.dp)),
+                .border(3.dp, darkBrown, RoundedCornerShape(12.dp)),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = TransparentDarkBrown,
+                contentColor = Color.White
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
@@ -134,7 +136,7 @@ fun CharacterScreen(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
-                PixelText("Character", fontSize = 42.sp)
+                PixelText("Character", fontSize = 80.sp)
                 Spacer(
                     Modifier.height(16.dp)
                 )

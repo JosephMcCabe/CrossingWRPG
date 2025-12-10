@@ -1,6 +1,6 @@
 package com.example.crossingwrpg.com.example.crossingwrpg
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.crossingwrpg.AchievementTracker
 import com.example.crossingwrpg.MusicPlayer
+import com.example.crossingwrpg.R
 import com.example.crossingwrpg.data.UserViewModel
 import com.example.crossingwrpg.pixelFontFamily
 
@@ -46,22 +49,18 @@ fun AchievementsScreenFunction(navController: NavHostController) {
 
     val completedCount = achievementTracker.getCompletedCount()
 
-
     MusicPlayer.pause()
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)
-    )
     Box(
-        contentAlignment = Alignment.TopCenter,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 35.dp)
-            .padding(16.dp)
-            .background(Color.White)
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
     )
-    {
+    {   Image(
+        painter = painterResource(R.drawable.scroll_background),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
         Row {
             Icon(
                 imageVector = Icons.Default.EmojiEvents,
@@ -76,12 +75,12 @@ fun AchievementsScreenFunction(navController: NavHostController) {
                 modifier = Modifier
             )
         }
+
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 70.dp)
-                .background(Color.White)
         )
         {
             item {
@@ -154,11 +153,12 @@ fun AchievementCard(
     if (completed) {
         achievementPercentCompleted = 275.0
     }
-
+    val tanColor = Color(0xFFD2B48C)
     ElevatedCard(
         modifier = Modifier
             .padding(bottom = 15.dp)
-            .width(300.dp)
+            .width(300.dp),
+            colors = androidx.compose.material3.CardDefaults.elevatedCardColors(containerColor = tanColor)
     ) {
         Icon(
             imageVector = Icons.Default.EmojiEvents,
