@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -74,13 +73,13 @@ fun HomePage(userVm: UserViewModel) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         Image(
             painter = painterResource(R.drawable.background_layer_1),
             contentDescription = null,
             modifier = Modifier
-                .requiredHeight(650.dp)
                 .fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -88,7 +87,6 @@ fun HomePage(userVm: UserViewModel) {
             painter = painterResource(R.drawable.background_layer_2),
             contentDescription = null,
             modifier = Modifier
-                .requiredHeight(650.dp)
                 .fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -96,7 +94,6 @@ fun HomePage(userVm: UserViewModel) {
             painter = painterResource(R.drawable.background_layer_3),
             contentDescription = null,
             modifier = Modifier
-                .requiredHeight(650.dp)
                 .fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -104,7 +101,7 @@ fun HomePage(userVm: UserViewModel) {
             painter = painterResource(R.drawable.dirtpath),
             contentDescription = null,
             modifier = Modifier
-                .offset(x = 0.dp, y = 494.dp)
+                .offset(x = 0.dp, y = 570.dp)
                 .height(300.dp)
                 .fillMaxWidth(),
             contentScale = ContentScale.Crop
@@ -123,7 +120,7 @@ fun HomePage(userVm: UserViewModel) {
                 contentDescription = "Soldier Sprite",
                 modifier = Modifier
                     .size(500.dp)
-                    .offset(x = 0.dp, y = 140.dp),
+                    .offset(x = 0.dp, y = 215.dp),
                 contentScale = ContentScale.Crop,
                 filterQuality = FilterQuality.None
             )
@@ -133,7 +130,7 @@ fun HomePage(userVm: UserViewModel) {
             modifier = Modifier
                 .padding(1.dp)
                 .height(100.dp)
-                .offset(y = 15.dp)
+                .offset(y = 25.dp)
                 .border(1.dp, Color.White, RoundedCornerShape(12.dp)),
             colors = CardDefaults.cardColors(
                 containerColor = Color.Black.copy(alpha = 0.3f)
